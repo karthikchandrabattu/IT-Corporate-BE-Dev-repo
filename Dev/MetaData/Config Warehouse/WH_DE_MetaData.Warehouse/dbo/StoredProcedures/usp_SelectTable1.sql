@@ -1,0 +1,3 @@
+CREATE   PROCEDURE dbo.usp_SelectTable1
+AS
+SELECT 1

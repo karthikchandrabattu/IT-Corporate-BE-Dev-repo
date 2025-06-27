@@ -1,0 +1,25 @@
+CREATE TABLE [Config].[MetaETL] (
+
+	[ConfigId] bigint NULL, 
+	[DBSourceName] varchar(max) NULL, 
+	[SourceDBName] varchar(max) NULL, 
+	[SourceSchemaName] varchar(max) NULL, 
+	[SourceTableName] varchar(max) NULL, 
+	[BronzeSchemaName] varchar(max) NULL, 
+	[BronzeTableName] varchar(max) NULL, 
+	[SilverSchemaName] varchar(max) NULL, 
+	[SilverTableName] varchar(max) NULL, 
+	[GoldSchemaName] varchar(max) NULL, 
+	[GoldTableName] varchar(max) NULL, 
+	[PrimaryKey] varchar(max) NULL, 
+	[IsFullLoad] int NOT NULL, 
+	[WaterMarkField] varchar(max) NULL, 
+	[WaterMarkValue] varchar(max) NULL, 
+	[IsActive] bigint NULL, 
+	[SourceQuery] varchar(max) NULL, 
+	[SourceSystem] varchar(max) NULL, 
+	[WaterMarkField2] varchar(max) NULL, 
+	[WaterMarkField3] varchar(max) NULL, 
+	[WaterMarkValue3] varchar(max) NULL, 
+	[WaterMarkValue2] varchar(max) NULL
+);

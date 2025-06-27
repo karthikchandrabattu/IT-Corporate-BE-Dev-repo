@@ -1,0 +1,26 @@
+CREATE TABLE [Config].[SQLServerSourceInformationSchema] (
+
+	[TABLE_CATALOG] varchar(max) NULL, 
+	[TABLE_SCHEMA] varchar(max) NULL, 
+	[TABLE_NAME] varchar(max) NULL, 
+	[COLUMN_NAME] varchar(max) NULL, 
+	[ORDINAL_POSITION] int NULL, 
+	[COLUMN_DEFAULT] varchar(max) NULL, 
+	[IS_NULLABLE] varchar(max) NULL, 
+	[DATA_TYPE] varchar(max) NULL, 
+	[CHARACTER_MAXIMUM_LENGTH] int NULL, 
+	[CHARACTER_OCTET_LENGTH] int NULL, 
+	[NUMERIC_PRECISION] smallint NULL, 
+	[NUMERIC_PRECISION_RADIX] smallint NULL, 
+	[NUMERIC_SCALE] int NULL, 
+	[DATETIME_PRECISION] smallint NULL, 
+	[CHARACTER_SET_CATALOG] varchar(max) NULL, 
+	[CHARACTER_SET_SCHEMA] varchar(max) NULL, 
+	[CHARACTER_SET_NAME] varchar(max) NULL, 
+	[COLLATION_CATALOG] varchar(max) NULL, 
+	[COLLATION_SCHEMA] varchar(max) NULL, 
+	[COLLATION_NAME] varchar(max) NULL, 
+	[DOMAIN_CATALOG] varchar(max) NULL, 
+	[DOMAIN_SCHEMA] varchar(max) NULL, 
+	[DOMAIN_NAME] varchar(max) NULL
+);
