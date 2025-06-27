@@ -1,0 +1,251 @@
+table Jira_Worklog_Report_task_type
+	lineageTag: b2ce7e8c-b17c-4ccd-a927-dfc0dc6edbaa
+	sourceLineageTag: [dbo].[Jira_Worklog_Report_task_type]
+
+	column Worklog_Id
+		dataType: int64
+		formatString: 0
+		lineageTag: 7052455c-d16a-4af3-9851-c416d55cceea
+		sourceLineageTag: Worklog_Id
+		summarizeBy: count
+		sourceColumn: Worklog_Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee_Guid
+		dataType: string
+		lineageTag: 6e9207b2-5481-459c-8c68-72ccab83eef2
+		sourceLineageTag: Employee_Guid
+		summarizeBy: none
+		sourceColumn: Employee_Guid
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee_Name
+		dataType: string
+		lineageTag: 7764c170-d89c-4453-8494-641d452a151c
+		sourceLineageTag: Employee_Name
+		summarizeBy: none
+		sourceColumn: Employee_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column DisplayName
+		dataType: string
+		lineageTag: 33576d8e-f3f2-42f2-934e-dc578082a01a
+		sourceLineageTag: DisplayName
+		summarizeBy: none
+		sourceColumn: DisplayName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee_Email
+		dataType: string
+		lineageTag: dfd421fb-c9ad-4b51-be94-87669d089de6
+		sourceLineageTag: Employee_Email
+		summarizeBy: none
+		sourceColumn: Employee_Email
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee_TimeZone
+		dataType: string
+		lineageTag: 03795111-3020-4a7b-8fa5-863d023ddca4
+		sourceLineageTag: Employee_TimeZone
+		summarizeBy: none
+		sourceColumn: Employee_TimeZone
+
+		annotation SummarizationSetBy = Automatic
+
+	column Employee_Locale
+		dataType: string
+		lineageTag: 8ee8c7d5-6f04-4886-976c-a8367bb7ba90
+		sourceLineageTag: Employee_Locale
+		summarizeBy: none
+		sourceColumn: Employee_Locale
+
+		annotation SummarizationSetBy = Automatic
+
+	column Team
+		dataType: string
+		lineageTag: 60dc8fed-2910-40bf-808a-288d451f7ef0
+		sourceLineageTag: Team
+		summarizeBy: none
+		sourceColumn: Team
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project_Name
+		dataType: string
+		lineageTag: 554ada77-279e-4104-9b63-6d92bf1bb77f
+		sourceLineageTag: Project_Name
+		summarizeBy: none
+		sourceColumn: Project_Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column Project_Key
+		dataType: string
+		lineageTag: e70a5a0d-cfcb-4596-8cea-f63444fb207f
+		sourceLineageTag: Project_Key
+		summarizeBy: none
+		sourceColumn: Project_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Issue_Summary
+		dataType: string
+		lineageTag: ca3fa46e-c299-4204-97a4-37b0456f94f9
+		sourceLineageTag: Issue_Summary
+		summarizeBy: none
+		sourceColumn: Issue_Summary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Issue_Key
+		dataType: string
+		lineageTag: 78d04610-bbfe-42bb-bde3-e6e81d6c7947
+		sourceLineageTag: Issue_Key
+		summarizeBy: none
+		sourceColumn: Issue_Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Issue_Type
+		dataType: string
+		lineageTag: 27a36800-ccf2-41b6-8812-67988c01dd17
+		sourceLineageTag: Issue_Type
+		summarizeBy: none
+		sourceColumn: Issue_Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column Immediate_Parent
+		dataType: string
+		lineageTag: ea4b3c0a-b860-482c-8476-2c055e5daf4f
+		sourceLineageTag: Immediate_Parent
+		summarizeBy: none
+		sourceColumn: Immediate_Parent
+
+		annotation SummarizationSetBy = Automatic
+
+	column Parent_Chain
+		dataType: string
+		lineageTag: 5804098a-9ecd-4171-8381-ea55e77d32c5
+		sourceLineageTag: Parent_Chain
+		summarizeBy: none
+		sourceColumn: Parent_Chain
+
+		annotation SummarizationSetBy = Automatic
+
+	column WorkItem_Hierarchy
+		dataType: string
+		lineageTag: b9086724-926b-4613-903a-b019979c848e
+		sourceLineageTag: WorkItem_Hierarchy
+		summarizeBy: none
+		sourceColumn: WorkItem_Hierarchy
+
+		annotation SummarizationSetBy = Automatic
+
+	column Priority
+		dataType: string
+		lineageTag: 2776a283-cbef-414e-9cf9-4c1b91dd8e31
+		sourceLineageTag: Priority
+		summarizeBy: none
+		sourceColumn: Priority
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 694d91db-04d4-4882-8487-debcc1055062
+		sourceLineageTag: Status
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 508d5cb4-d560-44cc-ad9b-8e883b66f76c
+		sourceLineageTag: Description
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column Jira_Hours
+		dataType: double
+		lineageTag: c35244c1-e96a-454c-ab6b-5027a0ea012b
+		sourceLineageTag: Jira_Hours
+		summarizeBy: sum
+		sourceColumn: Jira_Hours
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column startDate
+		dataType: string
+		lineageTag: 4cfdfb27-f784-4d61-9191-b18bdafb8339
+		sourceLineageTag: startDate
+		summarizeBy: none
+		sourceColumn: startDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column startTime
+		dataType: string
+		lineageTag: b14d1500-d86e-4453-9642-fa0e0873a643
+		sourceLineageTag: startTime
+		summarizeBy: none
+		sourceColumn: startTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDateTimeUtc
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 26b560d2-86a1-41f8-b91b-c56cbc6771d2
+		sourceLineageTag: StartDateTimeUtc
+		summarizeBy: none
+		sourceColumn: StartDateTimeUtc
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedAt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2d5b9d59-2e1d-4c26-89bc-00584ab5c30d
+		sourceLineageTag: CreatedAt
+		summarizeBy: none
+		sourceColumn: CreatedAt
+
+		annotation SummarizationSetBy = Automatic
+
+	column UpdatedAt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c213a5ee-5582-4ba1-8249-2e85304f6fc6
+		sourceLineageTag: UpdatedAt
+		summarizeBy: none
+		sourceColumn: UpdatedAt
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDateTime
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6c7379d4-3a37-4e8c-a0ce-39662f0fa4f2
+		sourceLineageTag: StartDateTime
+		summarizeBy: none
+		sourceColumn: StartDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Jira_Worklog_Report_task_type = entity
+		mode: directLake
+		source
+			entityName: Jira_Worklog_Report_task_type
+			expressionSource: 'DirectLake - LH_Reporting_Stg'
+
