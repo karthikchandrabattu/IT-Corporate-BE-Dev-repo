@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "VariableLibrary",
+    "displayName": "LV_Bronze_Silver_Gold_ABS",
+    "description": ""
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "515fb523-5e9c-a245-43d7-0e9873241ad8"
+  }
+}

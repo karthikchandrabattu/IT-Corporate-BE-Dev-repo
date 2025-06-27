@@ -1,0 +1,23 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/variables/1.0.0/schema.json",
+  "variables": [
+    {
+      "name": "bronze_abs",
+      "note": "",
+      "type": "String",
+      "value": "abfss://eb87c50a-8bc7-40f8-bb1a-8a135398c6f4@onelake.dfs.fabric.microsoft.com/89412544-9ac3-4f39-a42d-09c035b68d13/"
+    },
+    {
+      "name": "silver_abs",
+      "note": "",
+      "type": "String",
+      "value": "abfss://eb87c50a-8bc7-40f8-bb1a-8a135398c6f4@onelake.dfs.fabric.microsoft.com/16fadab9-4226-43b4-885a-6f54f0951826/"
+    },
+    {
+      "name": "gold_abs",
+      "note": "",
+      "type": "String",
+      "value": "abfss://eb87c50a-8bc7-40f8-bb1a-8a135398c6f4@onelake.dfs.fabric.microsoft.com/85c88f2a-28d8-44b3-9974-4b5dcc15c0e3/"
+    }
+  ]
+}
