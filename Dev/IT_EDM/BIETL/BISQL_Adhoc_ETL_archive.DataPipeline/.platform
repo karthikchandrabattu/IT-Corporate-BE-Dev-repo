@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "BISQL_Adhoc_ETL_archive"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "1e6d7e2a-74a2-b7d3-4aef-829bd3ea2056"
+  }
+}

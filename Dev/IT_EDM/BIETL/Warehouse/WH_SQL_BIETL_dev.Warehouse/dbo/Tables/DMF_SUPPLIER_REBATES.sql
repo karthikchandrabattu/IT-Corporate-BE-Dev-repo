@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[DMF_SUPPLIER_REBATES] (
+
+	[PMCATEGORY_KEY] bigint NULL, 
+	[REBATE_DATE] datetime2(6) NULL, 
+	[EXPIRY_DATE] datetime2(6) NULL, 
+	[REBATE_VALUE] decimal(38,6) NULL, 
+	[REBATE_VALUE_USD] decimal(38,6) NULL, 
+	[REBATE_STATUS] varchar(8000) NULL, 
+	[CURRENCY] varchar(8000) NULL, 
+	[EXCH_RATE_TO_US] decimal(38,6) NULL, 
+	[REFERENCE_NUMBER] varchar(8000) NULL, 
+	[APPROVED_BY] varchar(8000) NULL, 
+	[DATE_MODIFIED] datetime2(6) NULL
+);

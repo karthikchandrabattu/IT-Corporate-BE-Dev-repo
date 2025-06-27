@@ -1,0 +1,5 @@
+CREATE TABLE [dbo].[DMD_CLASS_CODE] (
+
+	[CLASS_CODE_KEY] bigint NULL, 
+	[CLASS_CODE] varchar(8000) NULL
+);

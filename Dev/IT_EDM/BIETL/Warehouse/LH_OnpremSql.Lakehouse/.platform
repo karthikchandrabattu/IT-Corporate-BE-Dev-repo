@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Lakehouse",
+    "displayName": "LH_OnpremSql"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "5195d68f-c173-8095-4079-e2674ac0ebbe"
+  }
+}

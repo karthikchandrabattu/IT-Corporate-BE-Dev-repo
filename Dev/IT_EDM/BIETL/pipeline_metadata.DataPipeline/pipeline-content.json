@@ -1,0 +1,78 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy data1",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "RestSource",
+            "httpRequestTimeout": "00:01:40",
+            "requestInterval": "00.00:00:00.010",
+            "requestMethod": "GET",
+            "paginationRules": {
+              "supportRFC5988": "true"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "type": "RestResource",
+              "typeProperties": {},
+              "schema": [],
+              "externalReferences": {
+                "connection": "7bb3adce-85f9-41c5-ad7e-402a4fc7f8b1"
+              }
+            }
+          },
+          "sink": {
+            "type": "DataWarehouseSink",
+            "allowCopyCommand": true,
+            "copyCommandSettings": {},
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  }
+                }
+              },
+              "type": "DataWarehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": "Config",
+                "table": "IncrementalConfigETL"
+              }
+            }
+          },
+          "enableStaging": true,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            },
+            "columnFlattenSettings": {
+              "treatArrayAsString": false,
+              "treatStructAsString": false,
+              "flattenColumnDelimiter": "."
+            }
+          }
+        }
+      }
+    ]
+  }
+}

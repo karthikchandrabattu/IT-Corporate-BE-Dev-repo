@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "CopyJob",
+    "displayName": "copyjob_onpremSql"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e057a9ba-29c0-966c-41d6-459ac897641f"
+  }
+}

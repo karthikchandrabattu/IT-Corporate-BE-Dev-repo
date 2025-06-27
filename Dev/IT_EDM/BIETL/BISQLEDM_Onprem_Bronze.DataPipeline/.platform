@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "BISQLEDM_Onprem_Bronze"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "47960dc8-c002-be9f-43b5-0f6825fcc2e3"
+  }
+}

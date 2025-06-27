@@ -1,0 +1,363 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy data1",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderQuery": "select * from Config.MetaETL AS DC OPTION (FOR TIMESTAMP AS OF '2025-06-21 13:00:00')",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-gsiddhxnonoulfxlg7e44fwtl4.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "05b1c87c-5a1a-4558-9548-4df55e0802a5",
+                    "workspaceId": "9e319034-73ed-455d-96eb-37c9ce16d35f"
+                  }
+                }
+              },
+              "type": "DataWarehouseTable",
+              "schema": [],
+              "typeProperties": {}
+            }
+          },
+          "sink": {
+            "type": "DataWarehouseSink",
+            "preCopyScript": "Delete from Config.MetaETL",
+            "allowCopyCommand": true,
+            "copyCommandSettings": {},
+            "disableMetricsCollection": false,
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "annotations": [],
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  }
+                }
+              },
+              "type": "DataWarehouseTable",
+              "schema": [],
+              "typeProperties": {
+                "schema": "Config",
+                "table": "MetaETL"
+              }
+            }
+          },
+          "enableStaging": true,
+          "translator": {
+            "type": "TabularTranslator",
+            "mappings": [
+              {
+                "source": {
+                  "name": "ConfigId",
+                  "type": "Int64",
+                  "physicalType": "bigint"
+                },
+                "sink": {
+                  "name": "ConfigId",
+                  "physicalType": "bigint"
+                }
+              },
+              {
+                "source": {
+                  "name": "DBSourceName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "DBSourceName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SourceDBName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SourceDBName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SourceSchemaName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SourceSchemaName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SourceTableName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SourceTableName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "BronzeSchemaName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "BronzeSchemaName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "BronzeTableName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "BronzeTableName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SilverSchemaName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SilverSchemaName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SilverTableName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SilverTableName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "GoldSchemaName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "GoldSchemaName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "GoldTableName",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "GoldTableName",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "PrimaryKey",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "PrimaryKey",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "IsFullLoad",
+                  "type": "Int32",
+                  "physicalType": "int"
+                },
+                "sink": {
+                  "name": "IsFullLoad",
+                  "physicalType": "int"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkField",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkField",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkValue",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkValue",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "IsActive",
+                  "type": "Int64",
+                  "physicalType": "bigint"
+                },
+                "sink": {
+                  "name": "IsActive",
+                  "physicalType": "bigint"
+                }
+              },
+              {
+                "source": {
+                  "name": "SourceQuery",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SourceQuery",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "SourceSystem",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "SourceSystem",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkField2",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkField2",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkField3",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkField3",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkValue3",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkValue3",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              },
+              {
+                "source": {
+                  "name": "WaterMarkValue2",
+                  "type": "String",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                },
+                "sink": {
+                  "name": "WaterMarkValue2",
+                  "physicalType": "varchar",
+                  "length": "8000"
+                }
+              }
+            ],
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        }
+      }
+    ]
+  }
+}

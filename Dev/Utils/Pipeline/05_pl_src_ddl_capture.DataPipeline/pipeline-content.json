@@ -1,0 +1,391 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[usp_GetUnmatchedTables]",
+            "storedProcedureParameters": {
+              "DBSource": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().parameters.DBSource",
+                  "type": "Expression"
+                }
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get List of tables",
+        "dependsOn": [
+          {
+            "activity": "Switch1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@not(equals(activity('Get List of tables').output.value[0].ConfigList, null))",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_UpdateTableList]",
+                "storedProcedureParameters": {
+                  "ConfigIdList": {
+                    "value": {
+                      "value": "@activity('Get List of tables').output.value[0].ConfigList",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update flag for the list of tables",
+              "dependsOn": []
+            },
+            {
+              "type": "Office365Outlook",
+              "typeProperties": {
+                "inputs": {
+                  "body": {
+                    "To": "Viswanath.Kolisetty@FutureElectronics.com",
+                    "Subject": "@string(json(activity('Notebook for Triger Invoke').output.result.exitValue).subject)",
+                    "Body": "<p>@{string(json(activity('Notebook for Triger Invoke').output.result.exitValue).email_body)}</p>",
+                    "Sensitivity": "",
+                    "Importance": "Normal"
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+                }
+              },
+              "name": "Schema mismatch Email Alert",
+              "dependsOn": [
+                {
+                  "activity": "Notebook for Triger Invoke",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "fea83d07-b2d6-b049-409b-f3c450c9b882",
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "parameters": {
+                  "batch_id": {
+                    "value": {
+                      "value": "@pipeline().parameters.BatchID",
+                      "type": "Expression"
+                    },
+                    "type": "int"
+                  },
+                  "table_list": {
+                    "value": {
+                      "value": "@activity('Get List of tables').output.value[0].TableList",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Notebook for Triger Invoke",
+              "dependsOn": [
+                {
+                  "activity": "Update flag for the list of tables",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ],
+          "ifFalseActivities": []
+        },
+        "name": "Check for mismatch",
+        "dependsOn": [
+          {
+            "activity": "Get List of tables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Switch",
+        "typeProperties": {
+          "on": {
+            "value": "@pipeline().parameters.DBSource",
+            "type": "Expression"
+          },
+          "cases": [
+            {
+              "value": "EDW",
+              "activities": [
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "SqlServerSource",
+                      "sqlReaderQuery": "SELECT * FROM INFORMATION_SCHEMA.COLUMNS ",
+                      "partitionOption": "None",
+                      "queryTimeout": "02:00:00",
+                      "datasetSettings": {
+                        "type": "SqlServerTable",
+                        "typeProperties": {
+                          "database": "EDW"
+                        },
+                        "schema": [],
+                        "externalReferences": {
+                          "connection": "4c053270-0612-4007-a1e6-42d60b26f224"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "sink": {
+                      "type": "LakehouseTableSink",
+                      "tableActionOption": "Overwrite",
+                      "partitionOption": "None",
+                      "datasetSettings": {
+                        "type": "LakehouseTable",
+                        "typeProperties": {
+                          "schema": "meta",
+                          "table": {
+                            "value": "SourceInformationSchema_@{pipeline().parameters.DBSource}",
+                            "type": "Expression"
+                          }
+                        },
+                        "schema": [],
+                        "linkedService": {
+                          "name": "DE_LH_Silver",
+                          "properties": {
+                            "type": "Lakehouse",
+                            "typeProperties": {
+                              "artifactId": "f0951826-6f54-885a-43b4-422616fadab9",
+                              "workspaceId": "00000000-0000-0000-0000-000000000000",
+                              "rootFolder": "Tables"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "translator": {
+                      "type": "TabularTranslator",
+                      "typeConversion": true,
+                      "typeConversionSettings": {
+                        "allowDataTruncation": true,
+                        "treatBooleanAsNumber": false
+                      }
+                    },
+                    "enableStaging": false
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Capture Source Schema",
+                  "dependsOn": []
+                },
+                {
+                  "type": "Wait",
+                  "typeProperties": {
+                    "waitTimeInSeconds": 300
+                  },
+                  "name": "Wait for 5 mins EDW",
+                  "dependsOn": [
+                    {
+                      "activity": "Capture Source Schema",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": "EDM",
+              "activities": [
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "SqlServerSource",
+                      "sqlReaderQuery": "SELECT * FROM INFORMATION_SCHEMA.COLUMNS ",
+                      "partitionOption": "None",
+                      "queryTimeout": "02:00:00",
+                      "datasetSettings": {
+                        "type": "SqlServerTable",
+                        "typeProperties": {
+                          "database": "EDM"
+                        },
+                        "schema": [],
+                        "externalReferences": {
+                          "connection": "d1565b37-5a8c-4ebb-9b25-ed365e944970"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "sink": {
+                      "type": "LakehouseTableSink",
+                      "tableActionOption": "Overwrite",
+                      "partitionOption": "None",
+                      "datasetSettings": {
+                        "type": "LakehouseTable",
+                        "typeProperties": {
+                          "schema": "meta",
+                          "table": {
+                            "value": "SourceInformationSchema_@{pipeline().parameters.DBSource}",
+                            "type": "Expression"
+                          }
+                        },
+                        "schema": [],
+                        "linkedService": {
+                          "name": "DE_LH_Silver",
+                          "properties": {
+                            "type": "Lakehouse",
+                            "typeProperties": {
+                              "artifactId": "f0951826-6f54-885a-43b4-422616fadab9",
+                              "workspaceId": "00000000-0000-0000-0000-000000000000",
+                              "rootFolder": "Tables"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "translator": {
+                      "type": "TabularTranslator",
+                      "typeConversion": true,
+                      "typeConversionSettings": {
+                        "allowDataTruncation": true,
+                        "treatBooleanAsNumber": false
+                      }
+                    },
+                    "enableStaging": false
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Capture Source Schema EDM",
+                  "dependsOn": []
+                },
+                {
+                  "type": "Wait",
+                  "typeProperties": {
+                    "waitTimeInSeconds": 300
+                  },
+                  "name": "Wait for 5 mins EDM",
+                  "dependsOn": [
+                    {
+                      "activity": "Capture Source Schema EDM",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "defaultActivities": []
+        },
+        "name": "Switch1",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "BatchID": {
+        "type": "int",
+        "defaultValue": 455
+      },
+      "DBSource": {
+        "type": "string",
+        "defaultValue": "EDW"
+      }
+    },
+    "variables": {
+      "ID": {
+        "type": "String"
+      },
+      "Tables": {
+        "type": "String"
+      }
+    }
+  }
+}

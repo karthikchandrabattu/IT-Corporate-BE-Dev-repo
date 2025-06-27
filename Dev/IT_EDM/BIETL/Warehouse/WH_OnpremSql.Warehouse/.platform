@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Warehouse",
+    "displayName": "WH_OnpremSql"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "e2466486-2615-a69f-44f1-c9384d8a2f10"
+  }
+}

@@ -1,0 +1,1220 @@
+{
+  "properties": {
+    "jobMode": "Batch",
+    "source": {
+      "type": "LakehouseTable",
+      "connectionSettings": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+          "artifactId": "8f504745-baf8-48ca-985f-8c20808d741c",
+          "rootFolder": "Tables"
+        }
+      }
+    },
+    "destination": {
+      "type": "DataWarehouseTable",
+      "connectionSettings": {
+        "type": "DataWarehouse",
+        "typeProperties": {
+          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+          "artifactId": "afdd6044-51ab-4280-8669-be216ed3e3d8",
+          "endPoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com"
+        }
+      }
+    },
+    "policy": {
+      "timeout": "0.12:00:00"
+    }
+  },
+  "activities": [
+    {
+      "id": "b0760699-5b5b-4dab-852e-38bab4974a73",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMA_AUTO_QUOTE_STATS_MONTHLY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMA_AUTO_QUOTE_STATS_MONTHLY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "3b44a8fc-d4be-4591-9e6c-0d16b9791189",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMA_PMC_METRICS_MONTHLY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMA_PMC_METRICS_MONTHLY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "0acaa2fe-3609-4fac-9bc6-19c549bd67d0",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_BRANCH"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_BRANCH"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "f9fa4690-afee-4d3a-b42b-e6b219d0d62c",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_CLASS_CODE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_CLASS_CODE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "075a2e13-3bd4-45b4-8b1d-a9eac567e770",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_COMPANY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_COMPANY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "d05f916b-fdac-4e73-b60a-ed3ff1ac33c9",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_CUST_BILLTO"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_CUST_BILLTO"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "9fe10352-e25a-4212-b2a0-25b28fb1760f",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_CUST_DUNS"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_CUST_DUNS"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "eaefaf9a-7407-4d0d-a3d4-5c41fcf9ea44",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_CUST_DUNSBRMERGED"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_CUST_DUNSBRMERGED"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "b48edd05-95cd-462c-b39c-824767d87372",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_CUST_SHIPTO"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_CUST_SHIPTO"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "36b5a434-db82-495f-bc19-2ff5a09764db",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_DATE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_DATE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "352c3c43-4323-4d34-bd39-fb1f53a58242",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_DATE_FM"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_DATE_FM"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "c4c3ccb3-cab5-4609-b5fb-39eee11cfbab",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_EMPLOYEE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_EMPLOYEE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "ab9c017d-b727-4132-83f3-9bcb215afa06",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_MANUFACTURER"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_MANUFACTURER"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "4f9330f6-6e55-49e2-b36e-ea1b0f71cd0d",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_MANUFACTURER_REGION"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_MANUFACTURER_REGION"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "5de27cc9-e632-45df-85e7-14a5c7998536",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_MARKETER"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_MARKETER"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "8f75657c-54bd-4fe0-8254-c59376978e7d",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_PMCATEGORY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_PMCATEGORY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "1964a6b3-a57a-4a90-b4dc-6973ca70cabb",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_QUOTE_REASON"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_QUOTE_REASON"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "02561262-a328-454e-b3c9-dc3fc31a9fc6",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_REGION"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_REGION"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "04d996e3-9ed3-47ff-881e-f2192a11df78",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMD_SALESCODE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMD_SALESCODE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "6bc9c7b2-f7ad-4358-b5c8-35713bb31d6c",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_BILLING"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_BILLING"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "a9baa9bd-264c-42d6-9be1-3847cf4fec8b",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_BOOKING"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_BOOKING"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "052cf631-4ba4-42f6-accd-aaaed232594a",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_DEBIT"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_DEBIT"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "0901d26f-9076-453e-8889-3278c77f225c",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_DEMAND_CREATION"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_DEMAND_CREATION"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "54211ea3-5d71-4785-9e76-4d3054c463dd",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_EXCHANGE_RATE_HISTORY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_EXCHANGE_RATE_HISTORY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "32b27f26-0ed7-465f-83df-3f29518b8950",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_NSB"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_NSB"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "6fed2eef-1d84-4e21-b658-65be099cca49",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_NSE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_NSE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "803a6fc0-4ae3-42eb-94d6-936826138981",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "90d268c0-53a5-4287-82b3-8bb441e199ea",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_FEEDBACK_LINES"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_FEEDBACK_LINES"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "94bf1610-585a-4060-b8d4-5b51e27b74f9",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_INTERMEDIATE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_INTERMEDIATE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "7548eb3b-5e6d-4e92-9e5a-12f0f1956841",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_MARKETING_FEEDBACK_LINES"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_MARKETING_FEEDBACK_LINES"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "63234621-2446-4377-9e71-415e389d4f84",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_MATCHING_AUDIT"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_MATCHING_AUDIT"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "bd9fdb2e-d45a-489e-b9c0-0b1c67995287",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_ORDER_MATCH"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_ORDER_MATCH"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "36938ac0-5a6a-4eef-874f-a11f92a2acf3",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTE_SBI"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTE_SBI"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "026be8d3-6627-4a35-8e8f-86efda83c478",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTELINE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTELINE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "30f9d4d3-3a2f-4f51-a3dc-6932b988182a",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_QUOTESUBLINE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_QUOTESUBLINE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "dc889dc2-b61d-45ff-97e3-c32d433eda23",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_REGISTRATION"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_REGISTRATION"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "bfaa72d1-a3e4-45bc-8cac-df46b09003af",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_SUPPLIER_REBATES"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_SUPPLIER_REBATES"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "db74febe-6485-45b5-8357-3eef4969a89c",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMFS_CBO"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMFS_CBO"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "96b20c69-180f-4520-a133-41ec3ceaab3a",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMFS_INVENTORY"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMFS_INVENTORY"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "677b8f27-7352-41fc-b1f8-fb4d8bfe3070",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMFS_PBO"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMFS_PBO"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "d8659212-b37c-4183-a8b2-23e760392142",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "SECURITY_DBA_RULES_ENG"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "SECURITY_DBA_RULES_ENG"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "7b94353d-a704-4275-b369-18c02f6a5d97",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "SECURITY_DBA_RULES_MKTG"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "SECURITY_DBA_RULES_MKTG"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "bfd4237a-ffc5-439b-884a-a5416039b5e9",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "SECURITY_DBA_RULES_MKTG_DEFAULT_ROLE"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "SECURITY_DBA_RULES_MKTG_DEFAULT_ROLE"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    },
+    {
+      "id": "ecfbe39c-4fa7-4942-865e-4678a1174834",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "SECURITY_DBA_RULES_SALES"
+          }
+        },
+        "destination": {
+          "tableOption": "autoCreate",
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "SECURITY_DBA_RULES_SALES"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    }
+  ]
+}

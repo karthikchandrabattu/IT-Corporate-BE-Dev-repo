@@ -1,0 +1,212 @@
+{
+  "name": "{{Dataset_Name}}",
+  "compatibilityLevel": 1604,
+  "model": {
+    "name": "{{Dataset_Name}}",
+    "culture": "en-US",
+    "collation": "Latin1_General_100_BIN2_UTF8",
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "sourceQueryCulture": "en-US",
+    "tables": [
+      {
+        "name": "test04",
+        "sourceLineageTag": "[dbo].[test04]",
+        "columns": [
+          {
+            "name": "MPN",
+            "dataType": "string",
+            "sourceColumn": "MPN",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "MPN",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Distributor",
+            "dataType": "string",
+            "sourceColumn": "Distributor",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "Distributor",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Manufacturer",
+            "dataType": "string",
+            "sourceColumn": "Manufacturer",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "Manufacturer",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "DISTI_NUM",
+            "dataType": "string",
+            "sourceColumn": "DISTI_NUM",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "DISTI_NUM",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "LeadTime",
+            "dataType": "string",
+            "sourceColumn": "LeadTime",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "LeadTime",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Stock",
+            "dataType": "string",
+            "sourceColumn": "Stock",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "Stock",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Qty",
+            "dataType": "string",
+            "sourceColumn": "Qty",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "Qty",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "Price",
+            "dataType": "string",
+            "sourceColumn": "Price",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "Price",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "StockFull",
+            "dataType": "string",
+            "sourceColumn": "StockFull",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "StockFull",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "ScrapeDate",
+            "dataType": "string",
+            "sourceColumn": "ScrapeDate",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "ScrapeDate",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          },
+          {
+            "name": "TimeStamp",
+            "dataType": "string",
+            "sourceColumn": "TimeStamp",
+            "sourceProviderType": "varchar",
+            "sourceLineageTag": "TimeStamp",
+            "summarizeBy": "none",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ]
+          }
+        ],
+        "partitions": [
+          {
+            "name": "{{Partition_Name}}",
+            "mode": "directLake",
+            "source": {
+              "type": "entity",
+              "entityName": "test04",
+              "expressionSource": "DatabaseQuery",
+              "schemaName": "dbo"
+            }
+          }
+        ],
+        "annotations": [
+          {
+            "name": "IsTableInBiModel",
+            "value": "False"
+          }
+        ]
+      }
+    ],
+    "expressions": [
+      {
+        "name": "DatabaseQuery",
+        "kind": "m",
+        "expression": "let\n    database = {{TDS_Endpoint}}\nin\n    database\n"
+      }
+    ],
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      },
+      {
+        "name": "SourceLineageTagType",
+        "value": "DatabaseFullyQualifiedName"
+      }
+    ]
+  }
+}

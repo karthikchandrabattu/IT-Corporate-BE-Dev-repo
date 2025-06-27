@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[DMF_QUOTE_MARKETING_FEEDBACK_LINES] (
+
+	[QUOTE_LINE_KEY] bigint NULL, 
+	[FEEDBACK_TYPE] varchar(8000) NULL, 
+	[FEEDBACK_STATUS_KEY] int NULL, 
+	[FOLLOW_UP_DATE] datetime2(6) NULL, 
+	[LOST_PRICE] decimal(18,6) NULL, 
+	[MOD_STAMP] datetime2(6) NULL, 
+	[LOGIN_ID] varchar(8000) NULL, 
+	[EXPECTED_ORDER_DATE] datetime2(6) NULL, 
+	[BUYER] varchar(8000) NULL, 
+	[REASON_ID] int NULL, 
+	[COMMENTS] varchar(8000) NULL
+);

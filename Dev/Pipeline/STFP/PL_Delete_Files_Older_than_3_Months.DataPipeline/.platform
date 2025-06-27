@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "PL_Delete_Files_Older_than_3_Months"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "07c36ecb-ae36-8061-45df-1952d2ed4a82"
+  }
+}

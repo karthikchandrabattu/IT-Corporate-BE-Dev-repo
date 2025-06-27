@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "CopyJob",
+    "displayName": "CJ_SQL_BIETL_dev"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "c006267e-1f2f-8315-464e-2216b1aa055d"
+  }
+}

@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[DMF_QUOTE_SBI] (
+
+	[QUOTE_SUBLINE_KEY] bigint NULL, 
+	[BOOKABLE_ACTIONS_ID] int NULL, 
+	[BOOKABLE_INDEX_KEY] int NULL, 
+	[COMMENT] varchar(8000) NULL, 
+	[CREATE_DATE] datetime2(6) NULL, 
+	[MOD_STAMP] datetime2(6) NULL, 
+	[LOGIN_ID] varchar(8000) NULL
+);

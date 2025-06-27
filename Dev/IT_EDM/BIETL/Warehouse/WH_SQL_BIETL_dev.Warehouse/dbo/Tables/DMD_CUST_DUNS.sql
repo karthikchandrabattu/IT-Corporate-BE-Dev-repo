@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[DMD_CUST_DUNS] (
+
+	[DUNS_KEY] bigint NULL, 
+	[DUNS] varchar(8000) NULL, 
+	[DUNS_NAME] varchar(8000) NULL, 
+	[STRATEGIC_ACCOUNT] smallint NULL, 
+	[ACCOUNT_TYPE] varchar(8000) NULL, 
+	[GAM_EMPLOYEE_KEY] bigint NULL, 
+	[GAM_VP_EMPLOYEE_KEY] bigint NULL
+);

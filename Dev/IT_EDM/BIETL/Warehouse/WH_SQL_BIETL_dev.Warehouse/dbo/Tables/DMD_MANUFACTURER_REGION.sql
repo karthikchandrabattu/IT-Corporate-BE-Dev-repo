@@ -1,0 +1,17 @@
+CREATE TABLE [dbo].[DMD_MANUFACTURER_REGION] (
+
+	[MANUFACTURER_REGION_KEY] bigint NULL, 
+	[REGION_KEY] bigint NULL, 
+	[MANUFACTURER_KEY] bigint NULL, 
+	[REGION] varchar(8000) NULL, 
+	[MFR] varchar(8000) NULL, 
+	[MFR_NAME] varchar(8000) NULL, 
+	[FAMILY_NAME] varchar(8000) NULL, 
+	[FRANCHSED] int NULL, 
+	[FTZM] int NULL, 
+	[QUOTES_TO_MKTG] int NULL, 
+	[FGCFLAG] varchar(8000) NULL, 
+	[FAMILYID] int NULL, 
+	[FAMILYNAMEID] int NULL, 
+	[CHAMPIONNAME] varchar(8000) NULL
+);

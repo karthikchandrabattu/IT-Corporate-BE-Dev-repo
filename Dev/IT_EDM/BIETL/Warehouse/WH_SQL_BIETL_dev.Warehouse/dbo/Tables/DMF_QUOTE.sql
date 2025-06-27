@@ -1,0 +1,26 @@
+CREATE TABLE [dbo].[DMF_QUOTE] (
+
+	[QUOTE_KEY] int NULL, 
+	[CMPY_KEY] bigint NULL, 
+	[REGION_KEY] bigint NULL, 
+	[SHIP_KEY] bigint NULL, 
+	[BILLTO_KEY] bigint NULL, 
+	[DUNS_KEY] bigint NULL, 
+	[BRANCH_KEY] bigint NULL, 
+	[QUOTE_NO] int NULL, 
+	[REVISION_NO] smallint NULL, 
+	[QUOTE_SOURCE] varchar(8000) NULL, 
+	[QUOTE_TYPE] varchar(8000) NULL, 
+	[QUOTE_STATUS] varchar(8000) NULL, 
+	[CONTACT_NAME] varchar(8000) NULL, 
+	[DUE_STAMP] datetime2(6) NULL, 
+	[AWARD_DATE] datetime2(6) NULL, 
+	[CAT3] varchar(8000) NULL, 
+	[COMPLETED_STAMP] datetime2(6) NULL, 
+	[PROJECT_NAME] varchar(8000) NULL, 
+	[BUYER_FIRST_NAME] varchar(8000) NULL, 
+	[BUYER_LAST_NAME] varchar(8000) NULL, 
+	[CREDIBILITY_INDEX] varchar(8000) NULL, 
+	[QUOTE_TYPE_KEY] int NULL, 
+	[ID] int NULL
+);

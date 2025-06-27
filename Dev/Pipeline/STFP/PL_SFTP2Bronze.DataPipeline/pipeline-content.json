@@ -1,0 +1,554 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "GetMetadata",
+        "typeProperties": {
+          "datasetSettings": {
+            "type": "DelimitedText",
+            "typeProperties": {
+              "location": {
+                "type": "SftpLocation",
+                "folderPath": {
+                  "value": "@pipeline().parameters.FolderPath",
+                  "type": "Expression"
+                }
+              },
+              "columnDelimiter": ",",
+              "quoteChar": "\"",
+              "escapeChar": "\\",
+              "firstRowAsHeader": true
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "1ef1ccb1-1bfc-4c19-9e60-c048505caed0"
+            },
+            "annotations": []
+          },
+          "fieldList": [
+            "childItems"
+          ],
+          "storeSettings": {
+            "type": "SftpReadSettings",
+            "disableChunking": false,
+            "recursive": true,
+            "enablePartitionDiscovery": false
+          },
+          "formatSettings": {
+            "type": "DelimitedTextReadSettings"
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get The List of Folders",
+        "dependsOn": [
+          {
+            "activity": "Set BatchID",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[InsertSFTPFolderData]",
+            "storedProcedureParameters": {
+              "JsonData": {
+                "type": "String",
+                "value": {
+                  "value": "@string(activity('Get The List of Folders').output.childItems)",
+                  "type": "Expression"
+                }
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Insert List of Folders",
+        "dependsOn": [
+          {
+            "activity": "Get The List of Folders",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Get List of Folders to Process').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "ExecutePipeline",
+              "typeProperties": {
+                "pipeline": {
+                  "referenceName": "a6e6ae7c-0c74-9b51-40ce-66bbe2e82293",
+                  "type": "PipelineReference"
+                },
+                "parameters": {
+                  "FolderName": "@concat(substring(item().FolderName, 8, 2), '-', substring(item().FolderName, 5, 2), '-', substring(item().FolderName, 0, 4))\n",
+                  "FolderPath": "@pipeline().parameters.FolderPath",
+                  "BatchID": "@variables('BatchID')"
+                },
+                "waitOnCompletion": true
+              },
+              "policy": {
+                "secureInput": false
+              },
+              "name": "Invoke_Iterate_each_folder pipeline",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "IterateOverEachFile",
+        "dependsOn": [
+          {
+            "activity": "Get List of Folders to Process",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[usp_BatchLevelAuditing_Updated]",
+            "storedProcedureParameters": {
+              "BatchID": {
+                "type": "Int64",
+                "value": null
+              },
+              "PipelineID": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().Pipeline",
+                  "type": "Expression"
+                }
+              },
+              "PipelineName": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().PipelineName",
+                  "type": "Expression"
+                }
+              },
+              "Remarks": {
+                "type": "String",
+                "value": "Batch process started"
+              },
+              "Status": {
+                "type": "String",
+                "value": "InProgress"
+              },
+              "TotalFiles": {
+                "type": "Int32",
+                "value": null
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Audit Batch On Start",
+        "dependsOn": []
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_BatchLevelAuditing_Updated]",
+          "storedProcedureParameters": {
+            "BatchID": {
+              "value": {
+                "value": "@variables('BatchID')",
+                "type": "Expression"
+              },
+              "type": "Int64"
+            },
+            "PipelineID": {
+              "value": {
+                "value": "@pipeline().Pipeline",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "Remarks": {
+              "value": "Batch processing complete",
+              "type": "String"
+            },
+            "Status": {
+              "value": "Completed",
+              "type": "String"
+            },
+            "TotalFiles": {
+              "value": null,
+              "type": "Int32"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "WH_DE_MetaData",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Audit Batch On Success",
+        "dependsOn": [
+          {
+            "activity": "Invoke File Delete Pipeline",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_BatchLevelAuditing_Updated]",
+          "storedProcedureParameters": {
+            "BatchID": {
+              "value": {
+                "value": "@variables('BatchID')",
+                "type": "Expression"
+              },
+              "type": "Int64"
+            },
+            "PipelineID": {
+              "value": {
+                "value": "@pipeline().Pipeline",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineName": {
+              "value": {
+                "value": "@pipeline().PipelineName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "Remarks": {
+              "value": "Failed due to inner activity failure",
+              "type": "String"
+            },
+            "Status": {
+              "value": "Failed",
+              "type": "String"
+            },
+            "TotalFiles": {
+              "value": null,
+              "type": "Int32"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "WH_DE_MetaData",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 3,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Audit Batch On Failed",
+        "dependsOn": [
+          {
+            "activity": "IterateOverEachFile",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "BatchID",
+          "value": {
+            "value": "@activity('Audit Batch On Start').output.firstRow.BatchID",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Set BatchID",
+        "dependsOn": [
+          {
+            "activity": "Audit Batch On Start",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Office365Outlook",
+        "typeProperties": {
+          "inputs": {
+            "body": {
+              "To": "Viswanath.Kolisetty@FutureElectronics.com",
+              "Subject": "SFTP to Fabric Pipeline Status - Success",
+              "Body": "<p>Hi Team,</p>\n<p>We are please to inform you that the pipeline @{pipeline().Pipeline} has successfully completed execution !!</p>\n<p>Please find the below Details:</p>\n<p>Pipeline ID: @{pipeline().Pipeline}</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>Pipeline Trigger Time: @{pipeline().TriggerTime}</p>\n<p>Status: SUCCESS</p>\n<p>Please review the processed data as needed. If you require any additional information feel free to reach out.</p>\n<p><strong>Best Regards,</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>",
+              "Sensitivity": "",
+              "Importance": "Normal"
+            },
+            "method": "post",
+            "path": "/v2/Mail"
+          }
+        },
+        "name": "Success mail Trigger",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "Audit Batch On Success",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Office365Outlook",
+        "typeProperties": {
+          "inputs": {
+            "body": {
+              "To": "Viswanath.Kolisetty@FutureElectronics.com",
+              "Subject": "SFTP to Fabric Pipeline Status - Failure",
+              "Body": "<p>Hi Team,</p>\n<p>We are please to inform you that the pipeline @{pipeline().Pipeline} has successfully completed execution !!</p>\n<p>Please find the below Details:</p>\n<p>Pipeline ID: @{pipeline().Pipeline}</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>Pipeline Trigger Time: @{pipeline().TriggerTime}</p>\n<p>Status: FAILURE</p>\n<p>Please review the processed data as needed. If you require any additional information feel free to reach out.</p>\n<p><strong>Best Regards,</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>",
+              "Sensitivity": "",
+              "Importance": "Normal"
+            },
+            "method": "post",
+            "path": "/v2/Mail"
+          }
+        },
+        "name": "Failure mail Trigger",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "Audit Batch On Failed",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[usp_GetListOfFiles]",
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get List of Folders to Process",
+        "dependsOn": [
+          {
+            "activity": "Insert List of Folders",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ExecutePipeline",
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "07c36ecb-ae36-8061-45df-1952d2ed4a82",
+            "type": "PipelineReference"
+          },
+          "parameters": {},
+          "waitOnCompletion": true
+        },
+        "policy": {
+          "secureInput": false
+        },
+        "name": "Invoke File Delete Pipeline",
+        "dependsOn": [
+          {
+            "activity": "IterateOverEachFile",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "654d4e51-81d8-9e03-4941-693f5ed18082",
+          "workspaceId": "00000000-0000-0000-0000-000000000000"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Delete Backup Tables",
+        "dependsOn": [
+          {
+            "activity": "Success mail Trigger",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "FolderPath": {
+        "type": "string",
+        "defaultValue": "/files/findchips"
+      }
+    },
+    "variables": {
+      "Retry": {
+        "type": "String"
+      },
+      "FolderName": {
+        "type": "Integer"
+      },
+      "FolderArray": {
+        "type": "Array",
+        "defaultValue": []
+      },
+      "LatestDateFolder": {
+        "type": "String",
+        "defaultValue": "''"
+      },
+      "BatchID": {
+        "type": "Integer"
+      }
+    }
+  }
+}

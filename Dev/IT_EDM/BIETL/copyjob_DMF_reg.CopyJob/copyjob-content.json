@@ -1,0 +1,860 @@
+{
+  "properties": {
+    "jobMode": "Batch",
+    "source": {
+      "type": "LakehouseTable",
+      "connectionSettings": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+          "artifactId": "8f504745-baf8-48ca-985f-8c20808d741c",
+          "rootFolder": "Tables"
+        }
+      }
+    },
+    "destination": {
+      "type": "DataWarehouseTable",
+      "connectionSettings": {
+        "type": "DataWarehouse",
+        "typeProperties": {
+          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+          "artifactId": "afdd6044-51ab-4280-8669-be216ed3e3d8",
+          "endPoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com"
+        }
+      }
+    },
+    "policy": {
+      "timeout": "0.12:00:00"
+    }
+  },
+  "activities": [
+    {
+      "id": "703fa4eb-803f-40d6-ad5c-b6933ba04b4b",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "table": "DMF_REGISTRATION"
+          }
+        },
+        "destination": {
+          "datasetSettings": {
+            "schema": "dbo",
+            "table": "DMF_REGISTRATION"
+          }
+        },
+        "enableStaging": true,
+        "translator": {
+          "type": "TabularTranslator",
+          "mappings": [
+            {
+              "source": {
+                "name": "REGISTRATION_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "REGISTRATION_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "REGION_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "REGION_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "CMPY_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "CMPY_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "CLASS_CODE_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "CLASS_CODE_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "MANUFACTURER_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "MANUFACTURER_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "MANUFACTURER_REGION_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "MANUFACTURER_REGION_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "SHIP_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "SHIP_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "BILLTO_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "BILLTO_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "DUNS_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "DUNS_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "BRANCH_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "BRANCH_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "PMCATEGORY_KEY",
+                "type": "Int64",
+                "physicalType": "long"
+              },
+              "destination": {
+                "name": "PMCATEGORY_KEY",
+                "physicalType": "bigint"
+              }
+            },
+            {
+              "source": {
+                "name": "Project_Num",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Project_Num",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "Part_Line_Number",
+                "type": "Int16",
+                "physicalType": "short"
+              },
+              "destination": {
+                "name": "Part_Line_Number",
+                "physicalType": "smallint"
+              }
+            },
+            {
+              "source": {
+                "name": "Project_Line",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Project_Line",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "AE_Code_Proj",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "AE_Code_Proj",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "AE_Name_Proj",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "AE_Name_Proj",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "AE_Code_Part",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "AE_Code_Part",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "AE_Name_Part",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "AE_Name_Part",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Project_Name",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Project_Name",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Proj_Create_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Proj_Create_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Brds_Per_Yr",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Brds_Per_Yr",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "Prototype_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Prototype_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Production_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Production_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Proj_Forecast_Sales",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Proj_Forecast_Sales",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "Opty_Status",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Opty_Status",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Project_Status",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Project_Status",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Proj_Confidence",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Proj_Confidence",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "MFR_Code",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "MFR_Code",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Class",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Class",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "MPN",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "MPN",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Core_MPN",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Core_MPN",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Part_Conf_Level",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Part_Conf_Level",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "Create_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Create_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Submit_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Submit_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Reg_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Reg_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Jumpball_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Jumpball_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Reject_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Reject_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Expiry_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Expiry_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Reg_Num",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Reg_Num",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Reg_Status",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Reg_Status",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Reg_Stage",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Reg_Stage",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Future_DW_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Future_DW_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Future_PW_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Future_PW_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Part_Modified_Date",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "Part_Modified_Date",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "Part_Forecast_Sales",
+                "type": "Double",
+                "physicalType": "double"
+              },
+              "destination": {
+                "name": "Part_Forecast_Sales",
+                "physicalType": "float"
+              }
+            },
+            {
+              "source": {
+                "name": "Primary_Socket",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Primary_Socket",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "DCDF_Flag",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "DCDF_Flag",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "PS_Part_Status_flag",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "PS_Part_Status_flag",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "DTOTL_SALE",
+                "type": "Decimal",
+                "physicalType": "decimal"
+              },
+              "destination": {
+                "name": "DTOTL_SALE",
+                "physicalType": "decimal",
+                "scale": 6,
+                "precision": 15
+              }
+            },
+            {
+              "source": {
+                "name": "CloseDate",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "CloseDate",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "CloseReason",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "CloseReason",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "MFRTrackingID",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "MFRTrackingID",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Block_Desc",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Block_Desc",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Block_Status",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Block_Status",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "DFORC_QTYX",
+                "type": "Int32",
+                "physicalType": "integer"
+              },
+              "destination": {
+                "name": "DFORC_QTYX",
+                "physicalType": "int"
+              }
+            },
+            {
+              "source": {
+                "name": "CPN",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "CPN",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "SOCKETID",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "SOCKETID",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Block_Diagram_ID",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Block_Diagram_ID",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "FE_INT_TOT_SALES",
+                "type": "Decimal",
+                "physicalType": "decimal"
+              },
+              "destination": {
+                "name": "FE_INT_TOT_SALES",
+                "physicalType": "decimal",
+                "scale": 6,
+                "precision": 15
+              }
+            },
+            {
+              "source": {
+                "name": "FE_INT_DW_DT",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "FE_INT_DW_DT",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "FE_INT_PW_DT",
+                "type": "DateTime",
+                "physicalType": "timestamp"
+              },
+              "destination": {
+                "name": "FE_INT_PW_DT",
+                "physicalType": "datetime2",
+                "precision": 6
+              }
+            },
+            {
+              "source": {
+                "name": "SALES_PRIORITY",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "SALES_PRIORITY",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "FE_BOARD_DESCR",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "FE_BOARD_DESCR",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "DTRGT_RESL",
+                "type": "Decimal",
+                "physicalType": "decimal"
+              },
+              "destination": {
+                "name": "DTRGT_RESL",
+                "physicalType": "decimal",
+                "scale": 4,
+                "precision": 14
+              }
+            },
+            {
+              "source": {
+                "name": "FE_PROJ_TYPE",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "FE_PROJ_TYPE",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "Proj_Create_By",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "Proj_Create_By",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "InternalDC_Tag",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "InternalDC_Tag",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            },
+            {
+              "source": {
+                "name": "RegPartMFR_Tag",
+                "type": "String",
+                "physicalType": "string"
+              },
+              "destination": {
+                "name": "RegPartMFR_Tag",
+                "physicalType": "varchar",
+                "length": "8000"
+              }
+            }
+          ]
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    }
+  ]
+}

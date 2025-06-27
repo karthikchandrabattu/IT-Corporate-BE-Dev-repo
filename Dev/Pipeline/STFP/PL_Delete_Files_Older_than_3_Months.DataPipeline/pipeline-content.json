@@ -1,0 +1,153 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "TridentNotebook",
+        "typeProperties": {
+          "notebookId": "193cf0ed-7d53-43c1-981b-270440c4c185",
+          "workspaceId": "0d16db09-7d7e-43e0-991f-2049ff0141c6"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get List of Files or Folders",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Get List of Files').output.childItems",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@greater(ticks(utcNow()), ticks(addDays(formatDateTime(concat(substring(item().name, 6, 4), '-', substring(item().name, 3, 2), '-', substring(item().name, 0, 2)), 'yyyy-MM-dd'), 90)))",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Delete",
+                    "typeProperties": {
+                      "enableLogging": false,
+                      "datasetSettings": {
+                        "type": "Binary",
+                        "typeProperties": {
+                          "location": {
+                            "type": "LakehouseLocation",
+                            "folderPath": {
+                              "value": "@concat('Pricing/',item().name)",
+                              "type": "Expression"
+                            }
+                          }
+                        },
+                        "linkedService": {
+                          "name": "DE_LH_Bronze",
+                          "properties": {
+                            "type": "Lakehouse",
+                            "typeProperties": {
+                              "artifactId": "89412544-9ac3-4f39-a42d-09c035b68d13",
+                              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+                              "rootFolder": "Files"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      },
+                      "storeSettings": {
+                        "type": "LakehouseReadSettings",
+                        "recursive": true,
+                        "enablePartitionDiscovery": false
+                      }
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Delete Files",
+                    "state": "Inactive",
+                    "onInactiveMarkAs": "Succeeded",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "Check files older than 3 months",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "Iterate each file to delete",
+        "dependsOn": [
+          {
+            "activity": "Get List of Files",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "GetMetadata",
+        "typeProperties": {
+          "datasetSettings": {
+            "type": "Binary",
+            "typeProperties": {
+              "location": {
+                "type": "LakehouseLocation",
+                "folderPath": "Pricing"
+              }
+            },
+            "linkedService": {
+              "name": "DE_LH_Bronze",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Files"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "fieldList": [
+            "childItems"
+          ],
+          "storeSettings": {
+            "type": "LakehouseReadSettings",
+            "recursive": true,
+            "enablePartitionDiscovery": false
+          },
+          "formatSettings": {
+            "type": "BinaryReadSettings"
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get List of Files",
+        "dependsOn": []
+      }
+    ]
+  }
+}

@@ -1,0 +1,839 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Switch",
+        "typeProperties": {
+          "on": {
+            "value": "@pipeline().parameters.DBSource",
+            "type": "Expression"
+          },
+          "cases": [
+            {
+              "value": "EDM",
+              "activities": [
+                {
+                  "type": "SetVariable",
+                  "typeProperties": {
+                    "variableName": "StartTime",
+                    "value": {
+                      "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                      "type": "Expression"
+                    }
+                  },
+                  "policy": {
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Set activity start time",
+                  "dependsOn": []
+                },
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "SqlServerSource",
+                      "sqlReaderQuery": {
+                        "value": "@pipeline().parameters.SourceQuery",
+                        "type": "Expression"
+                      },
+                      "partitionOption": "None",
+                      "queryTimeout": "02:00:00",
+                      "datasetSettings": {
+                        "type": "SqlServerTable",
+                        "typeProperties": {
+                          "database": "EDM"
+                        },
+                        "schema": [],
+                        "externalReferences": {
+                          "connection": "d1565b37-5a8c-4ebb-9b25-ed365e944970"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "sink": {
+                      "type": "LakehouseTableSink",
+                      "tableActionOption": "Overwrite",
+                      "partitionOption": "None",
+                      "datasetSettings": {
+                        "type": "LakehouseTable",
+                        "typeProperties": {
+                          "schema": {
+                            "value": "@pipeline().parameters.BronzeSchemaName",
+                            "type": "Expression"
+                          },
+                          "table": {
+                            "value": "@pipeline().parameters.TableName",
+                            "type": "Expression"
+                          }
+                        },
+                        "schema": [],
+                        "linkedService": {
+                          "name": "DE_LH_Bronze",
+                          "properties": {
+                            "type": "Lakehouse",
+                            "typeProperties": {
+                              "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                              "workspaceId": "00000000-0000-0000-0000-000000000000",
+                              "rootFolder": "Tables"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "translator": {
+                      "type": "TabularTranslator",
+                      "typeConversion": true,
+                      "typeConversionSettings": {
+                        "allowDataTruncation": true,
+                        "treatBooleanAsNumber": false
+                      }
+                    },
+                    "enableStaging": false
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Copy Data from Source to Bronze",
+                  "dependsOn": [
+                    {
+                      "activity": "Set activity start time",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SqlServerStoredProcedure",
+                  "typeProperties": {
+                    "storedProcedureName": "[Log].[SP_ETLBatchBronzeDetails]",
+                    "storedProcedureParameters": {
+                      "BatchId": {
+                        "value": {
+                          "value": "@pipeline().parameters.BatchID",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataReadSize": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.dataRead",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataWrittenSize": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.dataWritten",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "Duration": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.copyDuration",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "EndTime": {
+                        "value": {
+                          "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "ErrorMessage": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "FilesProcessedCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "PipelineId": {
+                        "value": {
+                          "value": "@pipeline().Pipeline",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "PipelineRunId": {
+                        "value": {
+                          "value": "@pipeline().RunId",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "RowCount": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.rowsRead",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "SchemaName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SchemaName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "SourceName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SourceName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StartTime": {
+                        "value": {
+                          "value": "@variables('StartTime')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "Status": {
+                        "value": "Success",
+                        "type": "String"
+                      },
+                      "TableId": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableId",
+                          "type": "Expression"
+                        },
+                        "type": "Int32"
+                      },
+                      "TableName": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ThroughputValue": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.throughput",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ItemType": {
+                        "value": "Copy activity",
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedService": {
+                    "name": "WH_DE_MetaData",
+                    "properties": {
+                      "type": "DataWarehouse",
+                      "typeProperties": {
+                        "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                        "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                        "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Activity Success Log",
+                  "dependsOn": [
+                    {
+                      "activity": "Copy Data from Source to Bronze",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SqlServerStoredProcedure",
+                  "typeProperties": {
+                    "storedProcedureName": "[Log].[SP_ETLBatchBronzeDetails]",
+                    "storedProcedureParameters": {
+                      "BatchId": {
+                        "value": {
+                          "value": "@pipeline().parameters.BatchID",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataReadSize": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "DataWrittenSize": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "Duration": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.copyDuration",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "EndTime": {
+                        "value": {
+                          "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "ErrorMessage": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze').output.errors[0].Message",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FilesProcessedCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "PipelineId": {
+                        "value": {
+                          "value": "@pipeline().Pipeline",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "PipelineRunId": {
+                        "value": {
+                          "value": "@pipeline().RunId",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "RowCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "SchemaName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SchemaName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "SourceName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SourceName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StartTime": {
+                        "value": {
+                          "value": "@variables('StartTime')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "Status": {
+                        "value": "Failure",
+                        "type": "String"
+                      },
+                      "TableId": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableId",
+                          "type": "Expression"
+                        },
+                        "type": "Int32"
+                      },
+                      "TableName": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ThroughputValue": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "ItemType": {
+                        "value": "Copy activity",
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedService": {
+                    "name": "WH_DE_MetaData",
+                    "properties": {
+                      "type": "DataWarehouse",
+                      "typeProperties": {
+                        "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                        "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                        "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Activity Failure Log",
+                  "dependsOn": [
+                    {
+                      "activity": "Copy Data from Source to Bronze",
+                      "dependencyConditions": [
+                        "Failed"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": "EDW",
+              "activities": [
+                {
+                  "type": "SetVariable",
+                  "typeProperties": {
+                    "variableName": "StartTime",
+                    "value": {
+                      "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                      "type": "Expression"
+                    }
+                  },
+                  "policy": {
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Set activity start time_copy1",
+                  "dependsOn": []
+                },
+                {
+                  "type": "Copy",
+                  "typeProperties": {
+                    "source": {
+                      "type": "SqlServerSource",
+                      "sqlReaderQuery": {
+                        "value": "@pipeline().parameters.SourceQuery",
+                        "type": "Expression"
+                      },
+                      "partitionOption": "None",
+                      "queryTimeout": "02:00:00",
+                      "datasetSettings": {
+                        "type": "SqlServerTable",
+                        "typeProperties": {
+                          "database": "EDW"
+                        },
+                        "schema": [],
+                        "externalReferences": {
+                          "connection": "58d6b2c6-2190-4a3c-8c98-eed094fd04b4"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "sink": {
+                      "type": "LakehouseTableSink",
+                      "tableActionOption": "Overwrite",
+                      "partitionOption": "None",
+                      "datasetSettings": {
+                        "type": "LakehouseTable",
+                        "typeProperties": {
+                          "schema": {
+                            "value": "@pipeline().parameters.BronzeSchemaName",
+                            "type": "Expression"
+                          },
+                          "table": {
+                            "value": "@pipeline().parameters.TableName",
+                            "type": "Expression"
+                          }
+                        },
+                        "schema": [],
+                        "linkedService": {
+                          "name": "DE_LH_Bronze",
+                          "properties": {
+                            "type": "Lakehouse",
+                            "typeProperties": {
+                              "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                              "workspaceId": "00000000-0000-0000-0000-000000000000",
+                              "rootFolder": "Tables"
+                            },
+                            "annotations": []
+                          }
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "translator": {
+                      "type": "TabularTranslator",
+                      "typeConversion": true,
+                      "typeConversionSettings": {
+                        "allowDataTruncation": true,
+                        "treatBooleanAsNumber": false
+                      }
+                    },
+                    "enableStaging": false
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Copy Data from Source to Bronze EDW",
+                  "dependsOn": [
+                    {
+                      "activity": "Set activity start time_copy1",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SqlServerStoredProcedure",
+                  "typeProperties": {
+                    "storedProcedureName": "[Log].[SP_ETLBatchBronzeDetails]",
+                    "storedProcedureParameters": {
+                      "BatchId": {
+                        "value": {
+                          "value": "@pipeline().parameters.BatchID",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataReadSize": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.dataRead",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataWrittenSize": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.dataWritten",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "Duration": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.copyDuration",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "EndTime": {
+                        "value": {
+                          "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "ErrorMessage": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "FilesProcessedCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "PipelineId": {
+                        "value": {
+                          "value": "@pipeline().Pipeline",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "PipelineRunId": {
+                        "value": {
+                          "value": "@pipeline().RunId",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "RowCount": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.rowsRead",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "SchemaName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SchemaName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "SourceName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SourceName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StartTime": {
+                        "value": {
+                          "value": "@variables('StartTime')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "Status": {
+                        "value": "Success",
+                        "type": "String"
+                      },
+                      "TableId": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableId",
+                          "type": "Expression"
+                        },
+                        "type": "Int32"
+                      },
+                      "TableName": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ThroughputValue": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.throughput",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ItemType": {
+                        "value": "Copy activity",
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedService": {
+                    "name": "WH_DE_MetaData",
+                    "properties": {
+                      "type": "DataWarehouse",
+                      "typeProperties": {
+                        "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                        "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                        "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Activity Success Log EDW",
+                  "dependsOn": [
+                    {
+                      "activity": "Copy Data from Source to Bronze EDW",
+                      "dependencyConditions": [
+                        "Succeeded"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SqlServerStoredProcedure",
+                  "typeProperties": {
+                    "storedProcedureName": "[Log].[SP_ETLBatchBronzeDetails]",
+                    "storedProcedureParameters": {
+                      "BatchId": {
+                        "value": {
+                          "value": "@pipeline().parameters.BatchID",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "DataReadSize": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "DataWrittenSize": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "Duration": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.copyDuration",
+                          "type": "Expression"
+                        },
+                        "type": "Int64"
+                      },
+                      "EndTime": {
+                        "value": {
+                          "value": "@convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "ErrorMessage": {
+                        "value": {
+                          "value": "@activity('Copy Data from Source to Bronze EDW').output.errors[0].Message",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "FilesProcessedCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "PipelineId": {
+                        "value": {
+                          "value": "@pipeline().Pipeline",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "PipelineRunId": {
+                        "value": {
+                          "value": "@pipeline().RunId",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "RowCount": {
+                        "value": null,
+                        "type": "Int64"
+                      },
+                      "SchemaName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SchemaName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "SourceName": {
+                        "value": {
+                          "value": "@pipeline().parameters.SourceName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "StartTime": {
+                        "value": {
+                          "value": "@variables('StartTime')",
+                          "type": "Expression"
+                        },
+                        "type": "Datetime"
+                      },
+                      "Status": {
+                        "value": "Failure",
+                        "type": "String"
+                      },
+                      "TableId": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableId",
+                          "type": "Expression"
+                        },
+                        "type": "Int32"
+                      },
+                      "TableName": {
+                        "value": {
+                          "value": "@pipeline().parameters.TableName",
+                          "type": "Expression"
+                        },
+                        "type": "String"
+                      },
+                      "ThroughputValue": {
+                        "value": null,
+                        "type": "String"
+                      },
+                      "ItemType": {
+                        "value": "Copy activity",
+                        "type": "String"
+                      }
+                    }
+                  },
+                  "linkedService": {
+                    "name": "WH_DE_MetaData",
+                    "properties": {
+                      "type": "DataWarehouse",
+                      "typeProperties": {
+                        "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                        "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                        "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureInput": false,
+                    "secureOutput": false
+                  },
+                  "name": "Activity Failure Log EDW",
+                  "dependsOn": [
+                    {
+                      "activity": "Copy Data from Source to Bronze EDW",
+                      "dependencyConditions": [
+                        "Failed"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "defaultActivities": []
+        },
+        "name": "Switch1",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "BatchID": {
+        "type": "int"
+      },
+      "SchemaName": {
+        "type": "string"
+      },
+      "SourceName": {
+        "type": "string"
+      },
+      "TableId": {
+        "type": "string"
+      },
+      "TableName": {
+        "type": "string"
+      },
+      "SourceQuery": {
+        "type": "string"
+      },
+      "BronzeSchemaName": {
+        "type": "string"
+      },
+      "DBSource": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "StartTime": {
+        "type": "String"
+      }
+    }
+  }
+}

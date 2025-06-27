@@ -1,0 +1,931 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "StartDate",
+          "value": {
+            "value": "@formatDateTime(convertTimeZone(utcNow(), 'UTC', 'Eastern Standard Time'), 'yyyy-MM-dd HH:mm:ss')\n",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Currentdate",
+        "dependsOn": []
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@pipeline().parameters.IsSourceFetchRequired",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "InvokePipeline",
+              "typeProperties": {
+                "parameters": {
+                  "TableListID": {
+                    "value": "@pipeline().parameters.TableListID",
+                    "type": "Expression"
+                  },
+                  "DWBatchID": {
+                    "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                    "type": "Expression"
+                  },
+                  "SourceSystem": {
+                    "value": "@pipeline().parameters.SourceSystem",
+                    "type": "Expression"
+                  },
+                  "BatchStartTime": {
+                    "value": "@activity('Get The BatchID').output.firstRow.BatchStartTime",
+                    "type": "Expression"
+                  },
+                  "BatchEndTime": {
+                    "value": "@activity('Get The BatchID').output.firstRow.BatchEndTime",
+                    "type": "Expression"
+                  },
+                  "IsFullLoadRequired": {
+                    "value": "@pipeline().parameters.IsFullLoadRequired",
+                    "type": "Expression"
+                  },
+                  "FilterDefaultValue": "2015-01-01"
+                },
+                "waitOnCompletion": true,
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "pipelineId": "47960dc8-c002-be9f-43b5-0f6825fcc2e3",
+                "operationType": "InvokeFabricPipeline"
+              },
+              "externalReferences": {
+                "connection": "4b12a476-1377-44b3-ba53-76fda8046414"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Fetch Data -Source to Bronze",
+              "dependsOn": []
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_ETLBatchOnEnd]",
+                "storedProcedureParameters": {
+                  "SystemName": {
+                    "value": {
+                      "value": "@pipeline().parameters.SourceSystem",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "LoadState": {
+                    "value": {
+                      "value": "@string('SourcetoBronze')",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "Status": {
+                    "value": "1",
+                    "type": "Int16"
+                  },
+                  "ETLBatchID": {
+                    "value": {
+                      "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                      "type": "Expression"
+                    },
+                    "type": "Int32"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "DW_AuditLogs",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "eed1070d-2c91-47ab-8cf8-4a475770804a",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update ETLBatch Bronze Layer",
+              "dependsOn": [
+                {
+                  "activity": "Fetch Data -Source to Bronze",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ],
+          "ifFalseActivities": []
+        },
+        "name": "If SourceFetch Required",
+        "dependsOn": [
+          {
+            "activity": "Currentdate",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "Get The BatchID",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[ETLBatchProcess]",
+            "storedProcedureParameters": {
+              "IsForceStartRequired": {
+                "type": "Boolean",
+                "value": {
+                  "value": "@pipeline().parameters.IsForceStartRequired",
+                  "type": "Expression"
+                }
+              },
+              "SourceSystem": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().parameters.SourceSystem",
+                  "type": "Expression"
+                }
+              },
+              "TriggerType": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().TriggerType",
+                  "type": "Expression"
+                }
+              },
+              "LoadState": {
+                "type": "String",
+                "value": {
+                  "value": "@string('SourcetoBronze-0')",
+                  "type": "Expression"
+                }
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "DW_AuditLogs",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "eed1070d-2c91-47ab-8cf8-4a475770804a",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get The BatchID",
+        "dependsOn": []
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@pipeline().parameters.IsSilverLayerRequired",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "8f8e1df5-4dcc-9110-41fc-d4a5022537c8",
+                "workspaceId": "00000000-0000-0000-0000-000000000000"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "NB Call- BronzeToSilver",
+              "description": "Need to create a notebook",
+              "dependsOn": [
+                {
+                  "activity": "Drop Tables",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_ETLBatchOnEnd]",
+                "storedProcedureParameters": {
+                  "SystemName": {
+                    "value": {
+                      "value": "@pipeline().parameters.SourceSystem",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "LoadState": {
+                    "value": {
+                      "value": "@string('BronzetoSilver')",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "Status": {
+                    "value": "1",
+                    "type": "Int16"
+                  },
+                  "ETLBatchID": {
+                    "value": {
+                      "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                      "type": "Expression"
+                    },
+                    "type": "Int32"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update ETLBatch Bronze Layer_copy1",
+              "state": "Inactive",
+              "onInactiveMarkAs": "Succeeded",
+              "dependsOn": [
+                {
+                  "activity": "Copy_Logs_to_Audittable",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "LakehouseTableSource",
+                  "datasetSettings": {
+                    "type": "LakehouseTable",
+                    "typeProperties": {
+                      "table": "audit_log_staging"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "LH_SQL_BIETL",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "9fce3718-5576-493d-a599-d7dc0f7a0e3c",
+                          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+                          "rootFolder": "Tables"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "DataWarehouseSink",
+                  "allowCopyCommand": true,
+                  "copyCommandSettings": {},
+                  "datasetSettings": {
+                    "type": "DataWarehouseTable",
+                    "typeProperties": {
+                      "schema": "dbo",
+                      "table": "Audit_ObjectExecutionLog"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "WH_DE_MetaData",
+                      "properties": {
+                        "type": "DataWarehouse",
+                        "typeProperties": {
+                          "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                          "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "mappings": [
+                    {
+                      "source": {
+                        "name": "ETLBatchID",
+                        "type": "Int64",
+                        "physicalType": "long"
+                      },
+                      "sink": {
+                        "name": "ETLBatchID",
+                        "physicalType": "bigint"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "PipelineID",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "PipelineID",
+                        "physicalType": "varchar",
+                        "length": "100"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "RunID",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "RunID",
+                        "physicalType": "varchar",
+                        "length": "100"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "BatchName",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "BatchName",
+                        "physicalType": "varchar",
+                        "length": "100"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "ActivityName",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "ActivityName",
+                        "physicalType": "varchar",
+                        "length": "100"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "ProcessDate",
+                        "type": "Date",
+                        "physicalType": "date"
+                      },
+                      "sink": {
+                        "name": "ProcessDate",
+                        "physicalType": "date"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "BatchStart",
+                        "type": "DateTime",
+                        "physicalType": "timestamp"
+                      },
+                      "sink": {
+                        "name": "BatchStart",
+                        "physicalType": "datetime2",
+                        "precision": 3
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "BatchEnd",
+                        "type": "DateTime",
+                        "physicalType": "timestamp"
+                      },
+                      "sink": {
+                        "name": "BatchEnd",
+                        "physicalType": "datetime2",
+                        "precision": 3
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "StartTime",
+                        "type": "DateTime",
+                        "physicalType": "timestamp"
+                      },
+                      "sink": {
+                        "name": "StartTime",
+                        "physicalType": "datetime2",
+                        "precision": 3
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "EndTime",
+                        "type": "DateTime",
+                        "physicalType": "timestamp"
+                      },
+                      "sink": {
+                        "name": "EndTime",
+                        "physicalType": "datetime2",
+                        "precision": 3
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "Status",
+                        "type": "Int64",
+                        "physicalType": "long"
+                      },
+                      "sink": {
+                        "name": "Status",
+                        "physicalType": "bigint"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "SystemErrorMessage",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "SystemErrorMessage",
+                        "physicalType": "varchar",
+                        "length": "4000"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "SourceCount",
+                        "type": "Int64",
+                        "physicalType": "long"
+                      },
+                      "sink": {
+                        "name": "SourceCount",
+                        "physicalType": "bigint"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "StageCount",
+                        "type": "Int64",
+                        "physicalType": "long"
+                      },
+                      "sink": {
+                        "name": "StageCount",
+                        "physicalType": "bigint"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "ListType",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "ListType",
+                        "physicalType": "varchar",
+                        "length": "20"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "ListID",
+                        "type": "Int64",
+                        "physicalType": "long"
+                      },
+                      "sink": {
+                        "name": "ListID",
+                        "physicalType": "bigint"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "FileWrittenToLakehouse",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "FileWrittenToLakehouse",
+                        "physicalType": "varchar",
+                        "length": "200"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "CopyingDuration",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "CopyingDuration",
+                        "physicalType": "varchar",
+                        "length": "50"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "DataReadSize",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "DataReadSize",
+                        "physicalType": "varchar",
+                        "length": "50"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "DataWriteSize",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "DataWriteSize",
+                        "physicalType": "varchar",
+                        "length": "50"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "ThroughputValue",
+                        "type": "Double",
+                        "physicalType": "double"
+                      },
+                      "sink": {
+                        "name": "ThroughputValue",
+                        "physicalType": "float"
+                      }
+                    },
+                    {
+                      "source": {
+                        "name": "Description",
+                        "type": "String",
+                        "physicalType": "string"
+                      },
+                      "sink": {
+                        "name": "Description",
+                        "physicalType": "varchar",
+                        "length": "100"
+                      }
+                    }
+                  ],
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": true
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Copy_Logs_to_Audittable",
+              "state": "Inactive",
+              "onInactiveMarkAs": "Succeeded",
+              "dependsOn": [
+                {
+                  "activity": "NB Call- BronzeToSilver",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Script",
+              "typeProperties": {
+                "scripts": [
+                  {
+                    "text": {
+                      "value": "USE WH_SQL_BIETL_dev;\n\nDECLARE @sql NVARCHAR(MAX);\nSELECT \n    @sql = STRING_AGG(\n      'DROP TABLE IF EXISTS dbo.' + QUOTENAME(SourceTableName) + ';'\n      , NCHAR(13)+NCHAR(10)\n    )\nFROM DW_AuditLogs.dbo.Metadata_TableList\nWHERE SourceTableName NOT IN (\n  'UserSecurity',\n  'PMOM_HEAD_COUNT',\n  'DMD_CUSTOMER_VIEW_NOW',\n  'DMF_PMOM_CHANGE_QUEUE',\n  'DMF_PMOM_OMA',\n  'DMF_PMOM_OREL',\n  'DMF_PMOM_SWOD'\n);\nPRINT @sql;\nEXEC sp_executesql @sql;",
+                      "type": "Expression"
+                    },
+                    "type": "Query"
+                  }
+                ],
+                "scriptBlockExecutionTimeout": "02:00:00"
+              },
+              "linkedService": {
+                "name": "WH_SQL_BIETL_dev",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "afdd6044-51ab-4280-8669-be216ed3e3d8",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Drop Tables",
+              "dependsOn": []
+            }
+          ],
+          "ifFalseActivities": []
+        },
+        "name": "If- Silver layer load required",
+        "dependsOn": [
+          {
+            "activity": "If SourceFetch Required",
+            "dependencyConditions": [
+              "Completed"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@pipeline().parameters.IsGoldLayerRequired",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "TridentNotebook",
+              "typeProperties": {
+                "notebookId": "eb5b0fe0-1508-90b6-49eb-1d16f32b79dd",
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "parameters": {
+                  "TableListID": {
+                    "value": {
+                      "value": "@pipeline().parameters.TableListID",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "DWBatchID": {
+                    "value": {
+                      "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                      "type": "Expression"
+                    },
+                    "type": "int"
+                  },
+                  "SourceSystem": {
+                    "value": {
+                      "value": "@pipeline().parameters.SourceSystem",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "LoadSilvertoGold",
+              "dependsOn": []
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_ETLBatchOnEnd]",
+                "storedProcedureParameters": {
+                  "SystemName": {
+                    "value": {
+                      "value": "@pipeline().parameters.SourceSystem",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "LoadState": {
+                    "value": {
+                      "value": "@string('SilvertoGold')",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "Status": {
+                    "value": "1",
+                    "type": "Int16"
+                  },
+                  "ETLBatchID": {
+                    "value": {
+                      "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                      "type": "Expression"
+                    },
+                    "type": "Int32"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update ETLBatch Bronze Layer_copy1_copy1",
+              "state": "Inactive",
+              "onInactiveMarkAs": "Succeeded",
+              "dependsOn": [
+                {
+                  "activity": "LoadSilvertoGold",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ],
+          "ifFalseActivities": []
+        },
+        "name": "If-Gold Layer Load required",
+        "dependsOn": [
+          {
+            "activity": "If SourceFetch Required",
+            "dependencyConditions": [
+              "Completed"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_ETLBatchOnEnd]",
+          "storedProcedureParameters": {
+            "SystemName": {
+              "value": {
+                "value": "@pipeline().parameters.SourceSystem",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "LoadState": {
+              "value": {
+                "value": "@string('complete')",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "Status": {
+              "value": "1",
+              "type": "Int16"
+            },
+            "ETLBatchID": {
+              "value": {
+                "value": "@activity('Get The BatchID').output.firstRow.ETLBatchID",
+                "type": "Expression"
+              },
+              "type": "Int32"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "DW_AuditLogs",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "eed1070d-2c91-47ab-8cf8-4a475770804a",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Update ETLBatch on Completion",
+        "dependsOn": [
+          {
+            "activity": "If-Gold Layer Load required",
+            "dependencyConditions": [
+              "Completed"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "IsSourceFetchRequired": {
+        "type": "bool",
+        "defaultValue": true
+      },
+      "IsSilverLayerRequired": {
+        "type": "bool",
+        "defaultValue": true
+      },
+      "IsGoldLayerRequired": {
+        "type": "bool",
+        "defaultValue": true
+      },
+      "TableListID": {
+        "type": "string",
+        "defaultValue": "all"
+      },
+      "IsForceStartRequired": {
+        "type": "bool",
+        "defaultValue": true
+      },
+      "SourceSystem": {
+        "type": "string",
+        "defaultValue": "SQLBIETL"
+      },
+      "IsFullLoadRequired": {
+        "type": "bool",
+        "defaultValue": true
+      }
+    },
+    "variables": {
+      "StartDate": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  }
+}

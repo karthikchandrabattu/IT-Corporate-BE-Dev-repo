@@ -1,0 +1,162 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "Copy_Oma_Audit_Data",
+        "type": "Copy",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;\n\nDECLARE @Today DateTime = CONVERT(Varchar(10),getdate(),121);\nDECLARE @TodayMinus13Months DateTime = DATEADD(MONTH, -13, @Today);\n\nSELECT DISTINCT\n  CASE WHEN RIGHT(AC.MFRX_CODE,1) IN ('4','9') THEN 'FGC' ELSE GroupNTDesc END AS BusinessUnit,\n  AC.Cmpy_Code,\n  Bill_Cust,\n  Ship_Cust,\n  Bill_Cust + Ship_Cust AS Shipto,\n  Ordr_Noxx,\n  Invc_Noxx,\n  Line_Noxx,\n  AC.ORDR_DATE,\n  CASE WHEN ISNULL(Approved,0) = 1 THEN 'Y' ELSE 'N' END AS [Approved (Y/N?)],\n  ApprovedByAccount,\n  ApprovedByFullName,\n  Comment,\n  ApprovedDate AS Approved_Date,\n  MFRX_CODE,\n  REQD_QTYX,\n  SHIP_QTYX,\n  AssignedToAccount,\n  AssignedToFullName,\n  AvgCostUSD,\n  HistoricalAvgCostUSD,\n  AC.Resale AS Resale,\n  Currency,\n  ExRate,\n  AuthCode,\n  SSDCost,\n  SSDCostCurr,\n  SSDCostExRate,\n  SSDCostUSD,\n  ASSUMEDSSDCost,\n  ASSUMEDSSDCostUSD,\n  AC.GP AS GP,\n  ProgrammingCost,\n  CostOverride,\n  Guid_noxx,\n  (\n    SELECT STUFF((\n      SELECT ',' + CAST(innerAC.IDActionCode AS VARCHAR(20))\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(500)'), 1, 1, '')\n  ) AS ActionCodes_Combined,\n  INV.FPN,\n  INV.MPN,\n  OEBODT_CUST_PART AS CPN,\n  INV.ITEMNO,\n  INV.CLASS,\n  INV.MFR,\n  OEBOHD_BILL_TYPE AS BILLTYPE,\n  OEBODT.REQD_DATE,\n  OEBODT.COMI_DATE AS COMMIT_DATE,\n  CBO_VALUE,\n  CBO_COST,\n  EXT_RESALE_USD AS POS,\n  EXT_BEXX_COST_USD AS BE_COST,\n  OEBODT_REGS_PART AS REG_NUM,\n  OEBODT_REGS_FLAG AS REG_FLAG,\n  OEBODT_ASSO_QUOT_NOXX AS CBO_QUOTENO,\n  OEBODT_ASSO_QUOT_CUST_LINE AS CBO_QUOTELN,\n  INV.POQ AS MOQ,\n  INV.MPQ,\n  Stock AS Stock_Qty,\n  INV.ATS AS ATS_Qty,\n  PBOSupplier AS PBO_Qty,\n  CBO AS CBO_Qty,\n  AvgCost,\n  LastCost,\n  AlgoCode,\n  ProductTypeCode AS ProductType_Code,\n  INV.LeadTime,\n  RedFlag AS Alert_Flag,\n  INV.RegisteredPart,\n  QuoteCompleteStamp AS Last_Quote_Date,\n  QSL.ResalePrice AS Last_Quoted_Price,\n  CostDescription AS Quoted_Cost_Category,\n  CUBILL_PAYM_TERM AS TERMS,\n  CUBILL_CRED_WTCH AS CREDIT_WATCH,\n  CUSHIP_CUST_TYPE AS Cust_Type,\n  CCV.ATGENP_DESC_XXXX AS Cust_Type_Description,\n  CUSHIP_PROG_TYPE AS Cust_Program_Type,\n  MRKT_SEGM AS Cust_Market_Segment,\n  [HTSCode] AS [HTS_CODE],\n  [HTSCodeTariffRate] AS [HTS_CODE_TARIFF_RATE],\n  [TariffCountryOfOrigin] AS COO,\n  ICO.ATGENP_DESC_XXXX AS SHIPTO_COUNTRY,\n  (\n    SELECT STUFF((\n      SELECT ',' + OAC.Reason\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      INNER JOIN [OrderEntryLive].[dbo].[ActionCodes] OAC ON innerAC.IDActionCode = OAC.IDActionCode\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(5000)'), 1, 1, '')\n  ) AS ActionCodesReason_Combined,\n  (\n    SELECT STUFF((\n      SELECT ',' + OAC.Description\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      INNER JOIN [OrderEntryLive].[dbo].[ActionCodes] OAC ON innerAC.IDActionCode = OAC.IDActionCode\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(5000)'), 1, 1, '')\n  ) AS ActionCodesDesc_Combined\n\nFROM OrderEntryLive.dbo.CboXActionCodes AC\nCROSS APPLY (\nSELECT OEBODT_CMPY_CODE, OEBODT_ITEM_NOXX,OEBOHD_BILL_TYPE, OEBODT.REQD_DATE, OEBODT.COMI_DATE, OEBODT_UNIT_PRIC, OEBODT_UNIT_COST,\n\t\t\t\t   OEBODT_REGS_PART,OEBODT_REGS_FLAG,OEBODT_ASSO_QUOT_NOXX,OEBODT_ASSO_QUOT_CUST_LINE, OEBODT_CUST_PART, OEBODT_PROJ_NOXX, OEBODT_ASSO_SLIN_NOXX,\n\t\t\t\t   OEBODT_ENDX_CUST_CMPY,OEBODT_ENDX_CUST_NOXX, OEBODT_CLAS_CODE, 0 AS EXT_RESALE_USD, 0 AS EXT_BEXX_COST_USD, \n\t\t\t\t   OEBODT_UNIT_COST * OEBODT_REQD_QTYX * OEBODT_RATE_USXX AS CBO_COST, OEBODT_UNIT_PRIC * OEBODT_REQD_QTYX * OEBODT_RATE_USXX AS CBO_VALUE\n\t\t\t  FROM DatawhseLive.dbo.OEBODTFL OEBODT\n\t\t\t\tINNER JOIN DatawhseLive.dbo.OEBOHDFL\n\t\t\t\tON\tOEBOHD_CMPY_CODE = OEBODT_CMPY_CODE\n\t\t\t\tAND OEBOHD_BILL_CUST = OEBODT_BILL_CUST\n\t\t\t\tAND OEBOHD_SHIP_CUST = OEBODT_SHIP_CUST\n\t\t\t\tAND OEBOHD_ORDR_NOXX = OEBODT_ORDR_NOXX\n\t\t\t\tAND OEBOHD_INVC_NOXX = OEBODT_INVC_NOXX\n\t\t\t  WHERE OEBODT_GUID_NOXX = Guid_noxx\n\t\t\t    AND OEBODT_CMPY_CODE = Cmpy_Code\t\n\t\t\tUNION\n\t\t\tSELECT OETRDT_CMPY_CODE, OETRDT_ITEM_NOXX, OETRDT_BILL_TYPE, OETRDT.REQD_DATE, OETRDT.COMI_DATE, OETRDT_UNIT_PRIC, OETRDT_UNIT_COST,\n\t\t\t\t   OETRDT_REGS_PART,OETRDT_REGS_FLAG,OETRDT_ASSO_QUOT_NOXX,OETRDT_ASSO_QUOT_CUST_LINE, OETRDT_CUST_PART, OETRDT_PROJ_NOXX, OETRDT_ASSO_SLIN_NOXX,\n\t\t\t\t   OETRDT_ENDX_CUST_CMPY,OETRDT_ENDX_CUST_NOXX, OETRDT_CLAS_CODE,\n\t\t\t\t   OETRDT_SHIP_QTYX * (ISNULL(OETRDT_UNIT_PRIC *  OETRDT_RATE_USDX_SALE,0.000000)) AS EXT_RESALE_USD,\n\t\t\t\t   OETRDT_SHIP_QTYX * (ISNULL(OETRDT_BEXX_UNIT_COST * OETRDT_RATE_USDX_SALE,0.000000)) as EXT_BEXX_COST_USD,\n\t\t\t\t   0 AS CBO_COST, 0 AS CBO_VALUE\n\t\t\t  FROM DatawhseLive.dbo.vwOETRDTFL OETRDT\n\t\t\t\tINNER JOIN DatawhseLive.dbo.vwOETRHDFL\n\t\t\t\tON  OETRHD_CMPY_CODE = OETRDT_CMPY_CODE\n\t\t\t\tAND OETRHD_BILL_CUST = OETRDT_BILL_CUST\n\t\t\t\tAND OETRHD_SHIP_CUST = OETRDT_SHIP_CUST\n\t\t\t\tAND OETRHD_ORDR_NOXX = OETRDT_ORDR_NOXX\n\t\t\t\tAND OETRHD_INVC_NOXX = OETRDT_INVC_NOXX\n\t\t\t WHERE OETRDT_CMPY_CODE = AC.Cmpy_Code\n\t\t\t   AND OETRDT_BILL_CUST = AC.Bill_Cust\n\t\t\t   AND OETRDT_SHIP_CUST = AC.Ship_cust\n\t\t\t   AND OETRDT_ORDR_NOXX = AC.Ordr_Noxx\n\t\t\t   AND OETRDT_INVC_NOXX = AC.Invc_Noxx\n\t\t\t   AND OETRDT_LINE_NOXX = AC.Line_Noxx\n\n) OEBODT\nINNER JOIN PMIQ.dbo.PMIQDetailFutView INV ON OEBODT_CMPY_CODE = INV.Company AND OEBODT_ITEM_NOXX = INV.ItemNo\nINNER JOIN DatawhseLive.dbo.CUBILLFL ON CUBILL_CMPY_CODE = AC.Cmpy_Code AND CUBILL_BILL_CUST = AC.Bill_Cust\nINNER JOIN DatawhseLive.dbo.CUSHIPFL ON CUSHIP_CMPY_CODE = AC.Cmpy_Code AND CUSHIP_BILL_CUST = AC.Bill_Cust AND CUSHIP_SHIP_CUST = AC.Ship_Cust\nINNER JOIN Datawhse.dbo.ATGENPFL ICO ON ICO.ATGENP_CMPY_CODE = CUSHIP_CMPY_CODE AND ICO.ATGENP_MAIN_CODE = 'ICO' AND ICO.ATGENP_SUBX_CODE = CUSHIP_CTRY_CODE\nINNER JOIN CorporateQuote.dbo.BUxClass B ON B.Company = OEBODT_CMPY_CODE AND B.Class = OEBODT_CLAS_CODE\nINNER JOIN CorporateQuote.dbo.Groups G ON B.Company = G.Company AND B.BU = G.GID\nLEFT JOIN Datawhse.dbo.ATGENPFL CCV ON CCV.ATGENP_CMPY_CODE = CUSHIP_CMPY_CODE AND CCV.ATGENP_MAIN_CODE = 'CCV' AND CCV.ATGENP_SUBX_CODE = CUSHIP_CUST_TYPE\nLEFT JOIN [DataWhse].[dbo].[TariffParts] TP ON TP.Company = INV.Company AND TP.ItemNo = INV.ItemNo AND PRIMARY_PART = 'Y'\nLEFT JOIN Datawhse.dbo.TSMHeader TH ON TH.CMPY_CODE = OEBODT_CMPY_CODE AND PROJ_NOXX = OEBODT_PROJ_NOXX\nOUTER APPLY (\n  SELECT QSL.ResalePrice, QL.QuoteCompleteStamp, CostDescription\n  FROM CorporateQuote.dbo.QuoteSubLineView QSL\n  INNER JOIN CorporateQuote.dbo.QuoteLineView QL ON QL.QuoteNo = QSL.QuoteNo AND QL.QuoteLineNo = QSL.QuoteLineNo\n  LEFT JOIN CorporateQuote.dbo.QuoteCostType QCT ON QSL.CostType = QCT.CostType\n  WHERE QSL.QuoteNo = OEBODT_ASSO_QUOT_NOXX AND QSL.QuoteLineNo = OEBODT_ASSO_QUOT_CUST_LINE AND QSL.QuoteSubLineNo = OEBODT_ASSO_SLIN_NOXX\n) QSL\n\nWHERE AC.ORDR_DATE >= @TodayMinus13Months;\n",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "annotations": [],
+              "type": "SqlServerTable",
+              "schema": [],
+              "typeProperties": {
+                "database": "OrderEntryLive"
+              },
+              "externalReferences": {
+                "connection": "3bec21fc-db53-4882-ac7d-bde1141b9e93"
+              }
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings"
+            },
+            "formatSettings": {
+              "type": "DelimitedTextWriteSettings",
+              "fileExtension": ".txt"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "LH_OMA_AI_dev",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4",
+                    "artifactId": "5677ae72-a852-4cf5-bebf-d7174c1589c0",
+                    "rootFolder": "Files"
+                  }
+                }
+              },
+              "type": "DelimitedText",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "fileName": "OMA_AUDIT_DATA.csv"
+                },
+                "columnDelimiter": ",",
+                "escapeChar": "\\",
+                "firstRowAsHeader": true,
+                "quoteChar": "\""
+              },
+              "schema": []
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        }
+      },
+      {
+        "name": "Copy data1",
+        "type": "Copy",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": "SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;\n\nDECLARE @Today DateTime = CONVERT(Varchar(10),getdate(),121);\nDECLARE @TodayMinus13Months DateTime = DATEADD(MONTH, -13, @Today);\n\nSELECT DISTINCT\n  CASE WHEN RIGHT(AC.MFRX_CODE,1) IN ('4','9') THEN 'FGC' ELSE GroupNTDesc END AS BusinessUnit,\n  AC.Cmpy_Code,\n  Bill_Cust,\n  Ship_Cust,\n  Bill_Cust + Ship_Cust AS Shipto,\n  Ordr_Noxx,\n  Invc_Noxx,\n  Line_Noxx,\n  AC.ORDR_DATE,\n  CASE WHEN ISNULL(Approved,0) = 1 THEN 'Y' ELSE 'N' END AS [Approved (Y/N?)],\n  ApprovedByAccount,\n  ApprovedByFullName,\n  Comment,\n  ApprovedDate AS Approved_Date,\n  MFRX_CODE,\n  REQD_QTYX,\n  SHIP_QTYX,\n  AssignedToAccount,\n  AssignedToFullName,\n  AvgCostUSD,\n  HistoricalAvgCostUSD,\n  AC.Resale AS Resale,\n  Currency,\n  ExRate,\n  AuthCode,\n  SSDCost,\n  SSDCostCurr,\n  SSDCostExRate,\n  SSDCostUSD,\n  ASSUMEDSSDCost,\n  ASSUMEDSSDCostUSD,\n  AC.GP AS GP,\n  ProgrammingCost,\n  CostOverride,\n  Guid_noxx,\n  (\n    SELECT STUFF((\n      SELECT ',' + CAST(innerAC.IDActionCode AS VARCHAR(20))\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(500)'), 1, 1, '')\n  ) AS ActionCodes_Combined,\n  INV.FPN,\n  INV.MPN,\n  OEBODT_CUST_PART AS CPN,\n  INV.ITEMNO,\n  INV.CLASS,\n  INV.MFR,\n  OEBOHD_BILL_TYPE AS BILLTYPE,\n  OEBODT.REQD_DATE,\n  OEBODT.COMI_DATE AS COMMIT_DATE,\n  CBO_VALUE,\n  CBO_COST,\n  EXT_RESALE_USD AS POS,\n  EXT_BEXX_COST_USD AS BE_COST,\n  OEBODT_REGS_PART AS REG_NUM,\n  OEBODT_REGS_FLAG AS REG_FLAG,\n  OEBODT_ASSO_QUOT_NOXX AS CBO_QUOTENO,\n  OEBODT_ASSO_QUOT_CUST_LINE AS CBO_QUOTELN,\n  INV.POQ AS MOQ,\n  INV.MPQ,\n  Stock AS Stock_Qty,\n  INV.ATS AS ATS_Qty,\n  PBOSupplier AS PBO_Qty,\n  CBO AS CBO_Qty,\n  AvgCost,\n  LastCost,\n  AlgoCode,\n  ProductTypeCode AS ProductType_Code,\n  INV.LeadTime,\n  RedFlag AS Alert_Flag,\n  INV.RegisteredPart,\n  QuoteCompleteStamp AS Last_Quote_Date,\n  QSL.ResalePrice AS Last_Quoted_Price,\n  CostDescription AS Quoted_Cost_Category,\n  CUBILL_PAYM_TERM AS TERMS,\n  CUBILL_CRED_WTCH AS CREDIT_WATCH,\n  CUSHIP_CUST_TYPE AS Cust_Type,\n  CCV.ATGENP_DESC_XXXX AS Cust_Type_Description,\n  CUSHIP_PROG_TYPE AS Cust_Program_Type,\n  MRKT_SEGM AS Cust_Market_Segment,\n  [HTSCode] AS [HTS CODE],\n  [HTSCodeTariffRate] AS [HTS CODE TARIFF RATE]\n  --[TariffCountryOfOrigin] AS COO,\n  --ICO.ATGENP_DESC_XXXX AS SHIPTO_COUNTRY,\n  /*\n  (\n    SELECT STUFF((\n      SELECT ',' + OAC.Reason\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      INNER JOIN [OrderEntryLive].[dbo].[ActionCodes] OAC ON innerAC.IDActionCode = OAC.IDActionCode\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(5000)'), 1, 1, '')\n  ) AS ActionCodesReason_Combined,\n  (\n    SELECT STUFF((\n      SELECT ',' + OAC.Description\n      FROM OrderEntryLive.dbo.CboXActionCodes innerAC\n      INNER JOIN [OrderEntryLive].[dbo].[ActionCodes] OAC ON innerAC.IDActionCode = OAC.IDActionCode\n      WHERE innerAC.Guid_noxx = AC.Guid_noxx AND innerAC.Cmpy_Code = AC.Cmpy_Code\n      FOR XML PATH(''), TYPE).value('.', 'VARCHAR(5000)'), 1, 1, '')\n  ) AS ActionCodesDesc_Combined\n  */\n\nFROM OrderEntryLive.dbo.CboXActionCodes AC\nCROSS APPLY (\nSELECT OEBODT_CMPY_CODE, OEBODT_ITEM_NOXX,OEBOHD_BILL_TYPE, OEBODT.REQD_DATE, OEBODT.COMI_DATE, OEBODT_UNIT_PRIC, OEBODT_UNIT_COST,\n\t\t\t\t   OEBODT_REGS_PART,OEBODT_REGS_FLAG,OEBODT_ASSO_QUOT_NOXX,OEBODT_ASSO_QUOT_CUST_LINE, OEBODT_CUST_PART, OEBODT_PROJ_NOXX, OEBODT_ASSO_SLIN_NOXX,\n\t\t\t\t   OEBODT_ENDX_CUST_CMPY,OEBODT_ENDX_CUST_NOXX, OEBODT_CLAS_CODE, 0 AS EXT_RESALE_USD, 0 AS EXT_BEXX_COST_USD, \n\t\t\t\t   OEBODT_UNIT_COST * OEBODT_REQD_QTYX * OEBODT_RATE_USXX AS CBO_COST, OEBODT_UNIT_PRIC * OEBODT_REQD_QTYX * OEBODT_RATE_USXX AS CBO_VALUE\n\t\t\t  FROM DatawhseLive.dbo.OEBODTFL OEBODT\n\t\t\t\tINNER JOIN DatawhseLive.dbo.OEBOHDFL\n\t\t\t\tON\tOEBOHD_CMPY_CODE = OEBODT_CMPY_CODE\n\t\t\t\tAND OEBOHD_BILL_CUST = OEBODT_BILL_CUST\n\t\t\t\tAND OEBOHD_SHIP_CUST = OEBODT_SHIP_CUST\n\t\t\t\tAND OEBOHD_ORDR_NOXX = OEBODT_ORDR_NOXX\n\t\t\t\tAND OEBOHD_INVC_NOXX = OEBODT_INVC_NOXX\n\t\t\t  WHERE OEBODT_GUID_NOXX = Guid_noxx\n\t\t\t    AND OEBODT_CMPY_CODE = Cmpy_Code\t\n\t\t\tUNION\n\t\t\tSELECT OETRDT_CMPY_CODE, OETRDT_ITEM_NOXX, OETRDT_BILL_TYPE, OETRDT.REQD_DATE, OETRDT.COMI_DATE, OETRDT_UNIT_PRIC, OETRDT_UNIT_COST,\n\t\t\t\t   OETRDT_REGS_PART,OETRDT_REGS_FLAG,OETRDT_ASSO_QUOT_NOXX,OETRDT_ASSO_QUOT_CUST_LINE, OETRDT_CUST_PART, OETRDT_PROJ_NOXX, OETRDT_ASSO_SLIN_NOXX,\n\t\t\t\t   OETRDT_ENDX_CUST_CMPY,OETRDT_ENDX_CUST_NOXX, OETRDT_CLAS_CODE,\n\t\t\t\t   OETRDT_SHIP_QTYX * (ISNULL(OETRDT_UNIT_PRIC *  OETRDT_RATE_USDX_SALE,0.000000)) AS EXT_RESALE_USD,\n\t\t\t\t   OETRDT_SHIP_QTYX * (ISNULL(OETRDT_BEXX_UNIT_COST * OETRDT_RATE_USDX_SALE,0.000000)) as EXT_BEXX_COST_USD,\n\t\t\t\t   0 AS CBO_COST, 0 AS CBO_VALUE\n\t\t\t  FROM DatawhseLive.dbo.vwOETRDTFL OETRDT\n\t\t\t\tINNER JOIN DatawhseLive.dbo.vwOETRHDFL\n\t\t\t\tON  OETRHD_CMPY_CODE = OETRDT_CMPY_CODE\n\t\t\t\tAND OETRHD_BILL_CUST = OETRDT_BILL_CUST\n\t\t\t\tAND OETRHD_SHIP_CUST = OETRDT_SHIP_CUST\n\t\t\t\tAND OETRHD_ORDR_NOXX = OETRDT_ORDR_NOXX\n\t\t\t\tAND OETRHD_INVC_NOXX = OETRDT_INVC_NOXX\n\t\t\t WHERE OETRDT_CMPY_CODE = AC.Cmpy_Code\n\t\t\t   AND OETRDT_BILL_CUST = AC.Bill_Cust\n\t\t\t   AND OETRDT_SHIP_CUST = AC.Ship_cust\n\t\t\t   AND OETRDT_ORDR_NOXX = AC.Ordr_Noxx\n\t\t\t   AND OETRDT_INVC_NOXX = AC.Invc_Noxx\n\t\t\t   AND OETRDT_LINE_NOXX = AC.Line_Noxx\n\n) OEBODT\nINNER JOIN PMIQ.dbo.PMIQDetailFutView INV ON OEBODT_CMPY_CODE = INV.Company AND OEBODT_ITEM_NOXX = INV.ItemNo\nINNER JOIN DatawhseLive.dbo.CUBILLFL ON CUBILL_CMPY_CODE = AC.Cmpy_Code AND CUBILL_BILL_CUST = AC.Bill_Cust\nINNER JOIN DatawhseLive.dbo.CUSHIPFL ON CUSHIP_CMPY_CODE = AC.Cmpy_Code AND CUSHIP_BILL_CUST = AC.Bill_Cust AND CUSHIP_SHIP_CUST = AC.Ship_Cust\nINNER JOIN Datawhse.dbo.ATGENPFL ICO ON ICO.ATGENP_CMPY_CODE = CUSHIP_CMPY_CODE AND ICO.ATGENP_MAIN_CODE = 'ICO' AND ICO.ATGENP_SUBX_CODE = CUSHIP_CTRY_CODE\nINNER JOIN CorporateQuote.dbo.BUxClass B ON B.Company = OEBODT_CMPY_CODE AND B.Class = OEBODT_CLAS_CODE\nINNER JOIN CorporateQuote.dbo.Groups G ON B.Company = G.Company AND B.BU = G.GID\nLEFT JOIN Datawhse.dbo.ATGENPFL CCV ON CCV.ATGENP_CMPY_CODE = CUSHIP_CMPY_CODE AND CCV.ATGENP_MAIN_CODE = 'CCV' AND CCV.ATGENP_SUBX_CODE = CUSHIP_CUST_TYPE\nLEFT JOIN [DataWhse].[dbo].[TariffParts] TP ON TP.Company = INV.Company AND TP.ItemNo = INV.ItemNo AND PRIMARY_PART = 'Y'\nLEFT JOIN Datawhse.dbo.TSMHeader TH ON TH.CMPY_CODE = OEBODT_CMPY_CODE AND PROJ_NOXX = OEBODT_PROJ_NOXX\nOUTER APPLY (\n  SELECT QSL.ResalePrice, QL.QuoteCompleteStamp, CostDescription\n  FROM CorporateQuote.dbo.QuoteSubLineView QSL\n  INNER JOIN CorporateQuote.dbo.QuoteLineView QL ON QL.QuoteNo = QSL.QuoteNo AND QL.QuoteLineNo = QSL.QuoteLineNo\n  LEFT JOIN CorporateQuote.dbo.QuoteCostType QCT ON QSL.CostType = QCT.CostType\n  WHERE QSL.QuoteNo = OEBODT_ASSO_QUOT_NOXX AND QSL.QuoteLineNo = OEBODT_ASSO_QUOT_CUST_LINE AND QSL.QuoteSubLineNo = OEBODT_ASSO_SLIN_NOXX\n) QSL\n\nWHERE AC.ORDR_DATE >= @TodayMinus13Months;\n",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None",
+            "datasetSettings": {
+              "annotations": [],
+              "type": "SqlServerTable",
+              "schema": [],
+              "typeProperties": {
+                "database": "OrderEntryLive"
+              },
+              "externalReferences": {
+                "connection": "3bec21fc-db53-4882-ac7d-bde1141b9e93"
+              }
+            }
+          },
+          "sink": {
+            "type": "DelimitedTextSink",
+            "storeSettings": {
+              "type": "LakehouseWriteSettings"
+            },
+            "formatSettings": {
+              "type": "DelimitedTextWriteSettings",
+              "fileExtension": ".txt"
+            },
+            "datasetSettings": {
+              "annotations": [],
+              "linkedService": {
+                "name": "LH_OMA_AI",
+                "properties": {
+                  "annotations": [],
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "workspaceId": "396e8831-ce18-4879-8649-afb3202741fe",
+                    "artifactId": "d7565994-cfa7-425f-83a1-7cbd9b17b177",
+                    "rootFolder": "Files"
+                  }
+                }
+              },
+              "type": "DelimitedText",
+              "typeProperties": {
+                "location": {
+                  "type": "LakehouseLocation",
+                  "fileName": "OMA_AUDIT_DATA_archive.csv"
+                },
+                "columnDelimiter": ",",
+                "escapeChar": "\\",
+                "firstRowAsHeader": true,
+                "quoteChar": "\""
+              },
+              "schema": []
+            }
+          },
+          "enableStaging": false,
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          }
+        }
+      }
+    ]
+  }
+}

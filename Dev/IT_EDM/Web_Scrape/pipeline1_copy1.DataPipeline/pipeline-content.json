@@ -1,0 +1,556 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "GetMetadata",
+        "typeProperties": {
+          "datasetSettings": {
+            "type": "DelimitedText",
+            "typeProperties": {
+              "location": {
+                "type": "SftpLocation",
+                "folderPath": {
+                  "value": "@pipeline().parameters.FilePath",
+                  "type": "Expression"
+                }
+              },
+              "columnDelimiter": ",",
+              "quoteChar": "\"",
+              "escapeChar": "\\",
+              "firstRowAsHeader": true
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "7f656dc3-2adc-4590-83cf-a0c6a667544b"
+            },
+            "annotations": []
+          },
+          "fieldList": [
+            "childItems"
+          ],
+          "storeSettings": {
+            "type": "SftpReadSettings",
+            "disableChunking": false,
+            "recursive": true,
+            "enablePartitionDiscovery": false
+          },
+          "formatSettings": {
+            "type": "DelimitedTextReadSettings"
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get_SFTP_Folders",
+        "dependsOn": []
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "database": "pricing"
+        },
+        "externalReferences": {
+          "connection": "58d6b2c6-2190-4a3c-8c98-eed094fd04b4"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "SP_Log_Execution",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "ForEach1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Script",
+        "typeProperties": {
+          "scripts": [
+            {
+              "text": {
+                "value": "SELECT COALESCE(\n    (SELECT TOP 1 FORMAT(ExecutionEndTime, 'yyyy-MM-dd')\n     FROM dbo.PipelineAuditLog\n     WHERE PipelineName = 'Ingest_SFTP_to_DW'\n       AND Status = 'Completed'\n       AND ExecutionEndTime IS NOT NULL\n     ORDER BY ExecutionEndTime DESC),\n    '1991-01-01') AS LatestProcessedDate;",
+                "type": "Expression"
+              },
+              "type": "Query",
+              "parameters": [
+                {
+                  "name": "ProcessName ",
+                  "type": "String",
+                  "value": "ScrapeData_Import",
+                  "direction": "Input"
+                },
+                {
+                  "name": "LatestProcessedFileName",
+                  "type": "String",
+                  "value": "",
+                  "direction": "Output",
+                  "size": 20
+                }
+              ]
+            }
+          ],
+          "scriptBlockExecutionTimeout": "02:00:00"
+        },
+        "linkedService": {
+          "name": "sql_load_warehouse",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "62e0f85a-da8d-49f5-ab81-2e95989e3e34",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get_LastProcessedDate",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Filter_New_SFTP_Folders').output.Value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "SftpReadSettings",
+                    "disableChunking": false,
+                    "recursive": true,
+                    "wildcardFolderPath": {
+                      "value": "@concat(pipeline().parameters.FilePath,'/', substring(variables('current_max_date'), 8, 2), '-', substring(variables('current_max_date'), 5, 2), '-', substring(variables('current_max_date'), 0, 4), '/')\n",
+                      "type": "Expression"
+                    },
+                    "wildcardFileName": "*",
+                    "enablePartitionDiscovery": false
+                  },
+                  "datasetSettings": {
+                    "type": "DelimitedText",
+                    "typeProperties": {
+                      "location": {
+                        "type": "SftpLocation"
+                      },
+                      "columnDelimiter": ",",
+                      "encodingName": "UTF-16LE",
+                      "quoteChar": "",
+                      "escapeChar": "",
+                      "firstRowAsHeader": true
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "7f656dc3-2adc-4590-83cf-a0c6a667544b"
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "DelimitedTextSink",
+                  "formatSettings": {
+                    "type": "DelimitedTextWriteSettings",
+                    "quoteAllText": true,
+                    "fileExtension": ".csv"
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseWriteSettings",
+                    "maxConcurrentConnections": 0
+                  },
+                  "datasetSettings": {
+                    "type": "DelimitedText",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat(pipeline().parameters.LakehouseDestination,'/', formatDateTime(variables('current_max_date'), 'dd-MM-yyyy'), '/')",
+                          "type": "Expression"
+                        }
+                      },
+                      "columnDelimiter": ",",
+                      "encodingName": "UTF-16LE",
+                      "quoteChar": "",
+                      "escapeChar": "",
+                      "firstRowAsHeader": true
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "LH_ETL_BI_ShortCut",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "91a1d28a-ffc5-a280-49b5-40354f720830",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Ingest_SFTP_to_Lakehouse",
+              "dependsOn": [
+                {
+                  "activity": "Update_Latest_Folder_Date",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SetVariable",
+              "typeProperties": {
+                "variableName": "current_max_date",
+                "value": {
+                  "value": "@if(\n    empty(variables('latest_folder_date')),\n    formatDateTime(\n        concat(\n            substring(item().name, 6, 4), '-',\n            substring(item().name, 3, 2), '-',\n            substring(item().name, 0, 2)\n        ),\n        'yyyy-MM-dd'\n    ),\n    if(\n        greater(\n            formatDateTime(\n                concat(\n                    substring(item().name, 6, 4), '-',  \n                    substring(item().name, 3, 2), '-',  \n                    substring(item().name, 0, 2)        \n                ),\n                'yyyy-MM-dd'\n            ),\n            variables('latest_folder_date')\n        ),\n        formatDateTime(\n            concat(\n                substring(item().name, 6, 4), '-',  \n                substring(item().name, 3, 2), '-',  \n                substring(item().name, 0, 2)        \n            ),\n            'yyyy-MM-dd'\n        ),\n        variables('latest_folder_date')\n    )\n)\n",
+                  "type": "Expression"
+                }
+              },
+              "policy": {
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "folder_date",
+              "dependsOn": []
+            },
+            {
+              "type": "SetVariable",
+              "typeProperties": {
+                "variableName": "latest_folder_date",
+                "value": {
+                  "value": "@variables('current_max_date')",
+                  "type": "Expression"
+                }
+              },
+              "policy": {
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Update_Latest_Folder_Date",
+              "dependsOn": [
+                {
+                  "activity": "folder_date",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "AppendVariable",
+              "typeProperties": {
+                "variableName": "FolderFileCounts",
+                "value": {
+                  "value": "{\n  \"FolderName\": \"@{item().name}\",\n  \"FileCount\": \"@{activity('Ingest_SFTP_to_Lakehouse').output.filesWritten}\"\n}",
+                  "type": "Expression"
+                }
+              },
+              "name": "Append variable1",
+              "dependsOn": [
+                {
+                  "activity": "Ingest_SFTP_to_Lakehouse",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "name": "Process_New_SFTP_Folders",
+        "dependsOn": [
+          {
+            "activity": "Filter_New_SFTP_Folders",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Filter",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('Get_SFTP_Folders').output.childItems",
+            "type": "Expression"
+          },
+          "condition": {
+            "value": "@greater(\n    formatDateTime(concat(substring(item().name, 6, 4), '-', substring(item().name, 3, 2), '-', substring(item().name, 0, 2)), 'yyyy-MM-dd'),\n    formatDateTime(activity('Get_LastProcessedDate').output.resultSets[0].rows[0].LatestProcessedDate, 'yyyy-MM-dd')\n)\n",
+            "type": "Expression"
+          }
+        },
+        "name": "Filter_New_SFTP_Folders",
+        "dependsOn": [
+          {
+            "activity": "Get_SFTP_Folders",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "Get_LastProcessedDate",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Script",
+        "typeProperties": {
+          "database": "Fabric_Test",
+          "scripts": [
+            {
+              "text": {
+                "value": "truncate table dbo.Raw_ZZZ_Import_01",
+                "type": "Expression"
+              },
+              "type": "Query"
+            }
+          ],
+          "scriptBlockExecutionTimeout": "02:00:00"
+        },
+        "externalReferences": {
+          "connection": "1a052d84-fdc6-43ea-85b6-8a58998491c4"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Clear_Staging_Table",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@range(1, variables('TotalFiles'))",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseReadSettings",
+                    "recursive": false,
+                    "enablePartitionDiscovery": true
+                  },
+                  "datasetSettings": {
+                    "type": "DelimitedText",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat(\n  pipeline().parameters.LakehouseDestination, \n  '/', \n  formatDateTime(variables('current_max_date'), 'dd-MM-yyyy'), \n  '/', \n  'z7183_findchips_', \n  formatDateTime(variables('current_max_date'), 'yyyy-MM-dd'), \n  '_part_', \n  item(), \n  '.csv'\n)\n",
+                          "type": "Expression"
+                        }
+                      },
+                      "columnDelimiter": ",",
+                      "encodingName": "UTF-8 without BOM",
+                      "quoteChar": "",
+                      "escapeChar": "",
+                      "firstRowAsHeader": true
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "LH_ETL_BI_ShortCut",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "91a1d28a-ffc5-a280-49b5-40354f720830",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "SqlServerSink",
+                  "tableOption": "autoCreate",
+                  "sqlWriterUseTableLock": false,
+                  "writeBehavior": "insert",
+                  "datasetSettings": {
+                    "type": "SqlServerTable",
+                    "typeProperties": {
+                      "schema": "dbo",
+                      "table": {
+                        "value": "@concat('Raw_ZZZ_Import_0', item())",
+                        "type": "Expression"
+                      },
+                      "database": "Fabric_test"
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "1a052d84-fdc6-43ea-85b6-8a58998491c4"
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Load_Lakehouse_to_DW_copy1",
+              "dependsOn": [
+                {
+                  "activity": "Truncate_Table_Before_Load",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Script",
+              "typeProperties": {
+                "database": "Fabric_Test",
+                "scripts": [
+                  {
+                    "text": {
+                      "value": "@concat(\n    'DECLARE @SQL NVARCHAR(MAX); ',\n    'IF OBJECT_ID(''dbo.Raw_ZZZ_Import_0', item(), ''', ''U'') IS NOT NULL ',\n    'BEGIN ',\n    'SET @SQL = ''TRUNCATE TABLE dbo.Raw_ZZZ_Import_0', item(), '''; ',\n    'EXEC sp_executesql @SQL; ',\n    'END'\n)\n",
+                      "type": "Expression"
+                    },
+                    "type": "Query"
+                  }
+                ],
+                "scriptBlockExecutionTimeout": "02:00:00"
+              },
+              "externalReferences": {
+                "connection": "1a052d84-fdc6-43ea-85b6-8a58998491c4"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Truncate_Table_Before_Load",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "ForEach1",
+        "dependsOn": [
+          {
+            "activity": "Process_New_SFTP_Folders",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "FilePath": {
+        "type": "string",
+        "defaultValue": "/files/findchips"
+      },
+      "LakehouseDestination": {
+        "type": "string",
+        "defaultValue": "Scrape_FindChips_new_06/"
+      },
+      "PipelineRunID": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "latest_folder_date": {
+        "type": "String"
+      },
+      "current_max_date": {
+        "type": "String"
+      },
+      "Retry": {
+        "type": "Integer",
+        "defaultValue": 10
+      },
+      "LogID": {
+        "type": "Integer"
+      },
+      "TotalFiles": {
+        "type": "Integer",
+        "defaultValue": 0
+      },
+      "FolderFilesCount": {
+        "type": "Integer"
+      },
+      "FolderFileCounts": {
+        "type": "Array"
+      }
+    }
+  }
+}

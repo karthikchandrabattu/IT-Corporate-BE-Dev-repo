@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "ExecutePipeline",
+        "typeProperties": {
+          "pipeline": {
+            "referenceName": "a3046119-8a22-932a-462d-931f898e84b6",
+            "type": "PipelineReference"
+          },
+          "parameters": {
+            "FolderPath": "/files/findchips"
+          },
+          "waitOnCompletion": true
+        },
+        "policy": {
+          "secureInput": false
+        },
+        "name": "Invoke SFTP Master Pipeline",
+        "dependsOn": []
+      }
+    ]
+  }
+}

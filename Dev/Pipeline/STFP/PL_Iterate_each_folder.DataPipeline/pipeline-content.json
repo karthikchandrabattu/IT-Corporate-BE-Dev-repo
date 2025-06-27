@@ -1,0 +1,260 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "GetMetadata",
+        "typeProperties": {
+          "datasetSettings": {
+            "type": "DelimitedText",
+            "typeProperties": {
+              "location": {
+                "type": "SftpLocation",
+                "folderPath": {
+                  "value": "@concat(pipeline().parameters.FolderPath,'/',pipeline().parameters.FolderName)",
+                  "type": "Expression"
+                }
+              },
+              "columnDelimiter": ",",
+              "quoteChar": "\"",
+              "escapeChar": "\\",
+              "firstRowAsHeader": true
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "1ef1ccb1-1bfc-4c19-9e60-c048505caed0"
+            },
+            "annotations": []
+          },
+          "fieldList": [
+            "childItems"
+          ],
+          "storeSettings": {
+            "type": "SftpReadSettings",
+            "disableChunking": false,
+            "enablePartitionDiscovery": false
+          },
+          "formatSettings": {
+            "type": "DelimitedTextReadSettings"
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get Metadata of each file",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": false,
+          "batchCount": 5,
+          "items": {
+            "value": "@activity('Get Metadata of each file').output.childItems",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "InvokePipeline",
+              "typeProperties": {
+                "parameters": {
+                  "FolderPath": {
+                    "value": "@pipeline().parameters.FolderPath",
+                    "type": "Expression"
+                  },
+                  "FileName": {
+                    "value": "@item().name",
+                    "type": "Expression"
+                  },
+                  "FolderName": {
+                    "value": "@pipeline().parameters.FolderName",
+                    "type": "Expression"
+                  },
+                  "BatchID": {
+                    "value": "@pipeline().parameters.BatchID",
+                    "type": "Expression"
+                  }
+                },
+                "waitOnCompletion": true,
+                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                "pipelineId": "942e65b9-ac8d-8970-4cae-6ebf1386ffd7",
+                "operationType": "InvokeFabricPipeline"
+              },
+              "externalReferences": {
+                "connection": "a14229d2-e179-4ac2-ad70-0451788a8531"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Invoke_Child_Pipeline",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "Process each files from folder",
+        "dependsOn": [
+          {
+            "activity": "Get Metadata of each file",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_UpdateSuccessFolderName]",
+          "storedProcedureParameters": {
+            "BatchID": {
+              "value": {
+                "value": "@pipeline().parameters.BatchID",
+                "type": "Expression"
+              },
+              "type": "Int64"
+            },
+            "FolderName": {
+              "value": {
+                "value": "@pipeline().parameters.FolderName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineID": {
+              "value": {
+                "value": "@pipeline().Pipeline",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineTriggerTime": {
+              "value": {
+                "value": "@pipeline().TriggerTime",
+                "type": "Expression"
+              },
+              "type": "Datetime"
+            },
+            "Status": {
+              "value": "SUCCESS",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "WH_DE_MetaData",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Update Success Folder Name",
+        "dependsOn": [
+          {
+            "activity": "Process each files from folder",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SqlServerStoredProcedure",
+        "typeProperties": {
+          "storedProcedureName": "[dbo].[usp_UpdateSuccessFolderName]",
+          "storedProcedureParameters": {
+            "BatchID": {
+              "value": {
+                "value": "@pipeline().parameters.BatchID",
+                "type": "Expression"
+              },
+              "type": "Int64"
+            },
+            "FolderName": {
+              "value": {
+                "value": "@pipeline().parameters.FolderName",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineID": {
+              "value": {
+                "value": "@pipeline().Pipeline",
+                "type": "Expression"
+              },
+              "type": "String"
+            },
+            "PipelineTriggerTime": {
+              "value": {
+                "value": "@pipeline().TriggerTime",
+                "type": "Expression"
+              },
+              "type": "DateTime"
+            },
+            "Status": {
+              "value": "FAILURE",
+              "type": "String"
+            }
+          }
+        },
+        "linkedService": {
+          "name": "WH_DE_MetaData",
+          "properties": {
+            "type": "DataWarehouse",
+            "typeProperties": {
+              "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+              "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+              "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Update Failure Folder Name",
+        "dependsOn": [
+          {
+            "activity": "Process each files from folder",
+            "dependencyConditions": [
+              "Failed"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "FolderName": {
+        "type": "string"
+      },
+      "FolderPath": {
+        "type": "string"
+      },
+      "BatchID": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "PL_Copy_Files_SFTP2Fabric_v1"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "942e65b9-ac8d-8970-4cae-6ebf1386ffd7"
+  }
+}

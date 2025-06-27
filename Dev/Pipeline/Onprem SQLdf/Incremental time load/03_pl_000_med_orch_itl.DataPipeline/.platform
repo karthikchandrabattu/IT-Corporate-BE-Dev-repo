@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "03_pl_000_med_orch_itl"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3dc02533-25ab-a10d-4345-18bcdad12fb0"
+  }
+}

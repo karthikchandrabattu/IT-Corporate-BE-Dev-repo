@@ -1,0 +1,875 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Until",
+        "typeProperties": {
+          "expression": {
+            "value": "@or(equals(variables('varSuccess'), 'Yes'), equals(variables('WaitTime'), 3600))",
+            "type": "Expression"
+          },
+          "timeout": "0.12:00:00",
+          "activities": [
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "SftpReadSettings",
+                    "disableChunking": false,
+                    "recursive": true,
+                    "enablePartitionDiscovery": false
+                  },
+                  "datasetSettings": {
+                    "type": "DelimitedText",
+                    "typeProperties": {
+                      "location": {
+                        "type": "SftpLocation",
+                        "folderPath": {
+                          "value": "@concat(pipeline().parameters.FolderPath,'/',pipeline().parameters.FolderName)",
+                          "type": "Expression"
+                        },
+                        "fileName": {
+                          "value": "@pipeline().parameters.FileName",
+                          "type": "Expression"
+                        }
+                      },
+                      "columnDelimiter": "|",
+                      "quoteChar": "'",
+                      "escapeChar": "\\",
+                      "firstRowAsHeader": true
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "1ef1ccb1-1bfc-4c19-9e60-c048505caed0"
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "ParquetSink",
+                  "formatSettings": {
+                    "type": "ParquetWriteSettings",
+                    "enableVertiParquet": true
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseWriteSettings"
+                  },
+                  "datasetSettings": {
+                    "type": "Parquet",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat('Pricing/',pipeline().parameters.FolderName)",
+                          "type": "Expression"
+                        },
+                        "fileName": {
+                          "value": "@concat(replace(pipeline().parameters.FileName,'.csv',''), '.parquet')",
+                          "type": "Expression"
+                        }
+                      },
+                      "compressionCodec": "snappy"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DE_LH_Bronze",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false,
+                "enableSkipIncompatibleRow": true
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "CopyDataFromSFTPtoBronze",
+              "dependsOn": []
+            },
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "ParquetSource",
+                  "storeSettings": {
+                    "type": "LakehouseReadSettings",
+                    "recursive": true,
+                    "enablePartitionDiscovery": false
+                  },
+                  "formatSettings": {
+                    "type": "ParquetReadSettings"
+                  },
+                  "datasetSettings": {
+                    "type": "Parquet",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat('Pricing/',pipeline().parameters.FolderName)",
+                          "type": "Expression"
+                        },
+                        "fileName": {
+                          "value": "@concat(replace(pipeline().parameters.FileName,'.csv',''),'.parquet')",
+                          "type": "Expression"
+                        }
+                      },
+                      "compressionCodec": "snappy"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DE_LH_Bronze",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "LakehouseTableSink",
+                  "tableActionOption": "Overwrite",
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "type": "LakehouseTable",
+                    "typeProperties": {
+                      "schema": {
+                        "value": "Pricing",
+                        "type": "Expression"
+                      },
+                      "table": {
+                        "value": "@replace(replace(pipeline().parameters.FileName, '.csv', ''),'-','_')",
+                        "type": "Expression"
+                      }
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DE_LH_Bronze",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Tables"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "CopyDataBronzeAsTables",
+              "dependsOn": [
+                {
+                  "activity": "CopyDataFromSFTPtoBronze",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@greater(activity('CopyDataBronzeAsTables').output.filesRead,0)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "SqlServerStoredProcedure",
+                    "typeProperties": {
+                      "storedProcedureName": "[dbo].[UpdateSFTPFileDownloadLog_Updated]",
+                      "storedProcedureParameters": {
+                        "ErrorMessage": {
+                          "value": null,
+                          "type": "String"
+                        },
+                        "FileName": {
+                          "value": {
+                            "value": "@pipeline().parameters.FileName",
+                            "type": "Expression"
+                          },
+                          "type": "String"
+                        },
+                        "LogID": {
+                          "value": {
+                            "value": "@variables('LogID')",
+                            "type": "Expression"
+                          },
+                          "type": "Int64"
+                        },
+                        "RowCount": {
+                          "value": {
+                            "value": "@activity('Copy Data to SQL Warehouse').output.rowsCopied",
+                            "type": "Expression"
+                          },
+                          "type": "Int64"
+                        },
+                        "Status": {
+                          "value": "Success",
+                          "type": "String"
+                        }
+                      }
+                    },
+                    "linkedService": {
+                      "name": "WH_DE_MetaData",
+                      "properties": {
+                        "type": "DataWarehouse",
+                        "typeProperties": {
+                          "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                          "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                          "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 2,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Audit On Success",
+                    "dependsOn": [
+                      {
+                        "activity": "Set value as Success",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "varSuccess",
+                      "value": {
+                        "value": "@variables('varIsSuccess')",
+                        "type": "Expression"
+                      }
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Set value as Success",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": [
+                  {
+                    "type": "Wait",
+                    "typeProperties": {
+                      "waitTimeInSeconds": 30
+                    },
+                    "name": "Wait for 30 seconds",
+                    "dependsOn": []
+                  },
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "TempWaitTime",
+                      "value": {
+                        "value": "@add(variables('WaitTime'), 30)",
+                        "type": "Expression"
+                      }
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Set value for TempWaitTime",
+                    "dependsOn": [
+                      {
+                        "activity": "Wait for 30 seconds",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "SetVariable",
+                    "typeProperties": {
+                      "variableName": "WaitTime",
+                      "value": {
+                        "value": "@variables('TempWaitTime')",
+                        "type": "Expression"
+                      }
+                    },
+                    "policy": {
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Set value for Wait Time",
+                    "dependsOn": [
+                      {
+                        "activity": "Set value for TempWaitTime",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "name": "Check for File movement",
+              "dependsOn": [
+                {
+                  "activity": "Execute SP to Load Data",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[UpdateSFTPFileDownloadLog_Updated]",
+                "storedProcedureParameters": {
+                  "ErrorMessage": {
+                    "value": {
+                      "value": "@activity('CopyDataBronzeAsTables').output.errors",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "FileName": {
+                    "value": {
+                      "value": "@pipeline().parameters.FileName",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  },
+                  "LogID": {
+                    "value": {
+                      "value": "@variables('LogID')",
+                      "type": "Expression"
+                    },
+                    "type": "Int64"
+                  },
+                  "Status": {
+                    "value": "Failed",
+                    "type": "String"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 3,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Audit On Failed",
+              "dependsOn": [
+                {
+                  "activity": "CopyDataBronzeAsTables",
+                  "dependencyConditions": [
+                    "Failed"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "ParquetSource",
+                  "storeSettings": {
+                    "type": "LakehouseReadSettings",
+                    "recursive": true,
+                    "enablePartitionDiscovery": false
+                  },
+                  "formatSettings": {
+                    "type": "ParquetReadSettings"
+                  },
+                  "datasetSettings": {
+                    "type": "Parquet",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "folderPath": {
+                          "value": "@concat('Pricing/',pipeline().parameters.FolderName)",
+                          "type": "Expression"
+                        },
+                        "fileName": {
+                          "value": "@concat(replace(pipeline().parameters.FileName,'.csv',''), '.parquet')",
+                          "type": "Expression"
+                        }
+                      },
+                      "compressionCodec": "snappy"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DE_LH_Bronze",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "35b68d13-09c0-a42d-4f39-9ac389412544",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Files"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "SqlServerSink",
+                  "tableOption": "autoCreate",
+                  "preCopyScript": {
+                    "value": "@concat(\n  'IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ''scrape'' AND TABLE_NAME = ''',\n    concat('Raw_', 'zzz_', \n      if(contains(pipeline().parameters.FileName, 'part_1'), 'Import_01',\n      if(contains(pipeline().parameters.FileName, 'part_2'), 'Import_02',\n      if(contains(pipeline().parameters.FileName, 'part_3'), 'Import_03',\n      if(contains(pipeline().parameters.FileName, 'part_4'), 'Import_04',\n      if(contains(pipeline().parameters.FileName, 'part_5'), 'Import_05', 'Unknown')))))\n    ),\n  ''') BEGIN DELETE FROM scrape.',\n    concat('Raw_', 'zzz_', \n      if(contains(pipeline().parameters.FileName, 'part_1'), 'Import_01',\n      if(contains(pipeline().parameters.FileName, 'part_2'), 'Import_02',\n      if(contains(pipeline().parameters.FileName, 'part_3'), 'Import_03',\n      if(contains(pipeline().parameters.FileName, 'part_4'), 'Import_04',\n      if(contains(pipeline().parameters.FileName, 'part_5'), 'Import_05', 'Unknown')))))\n    ),\n  ' END'\n)",
+                    "type": "Expression"
+                  },
+                  "sqlWriterUseTableLock": false,
+                  "writeBehavior": "insert",
+                  "datasetSettings": {
+                    "type": "SqlServerTable",
+                    "typeProperties": {
+                      "schema": "scrape",
+                      "table": {
+                        "value": "@{ \n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_1'), 'Raw_zzz_Import_01',\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_2'), 'Raw_zzz_Import_02',\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_3'), 'Raw_zzz_Import_03',\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_4'), 'Raw_zzz_Import_04',\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_5'), 'Raw_zzz_Import_05', 'Unknown')))))\n}",
+                        "type": "Expression"
+                      },
+                      "database": "pricing"
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "4c053270-0612-4007-a1e6-42d60b26f224"
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Copy Data to SQL Warehouse",
+              "dependsOn": [
+                {
+                  "activity": "CopyDataBronzeAsTables",
+                  "dependencyConditions": [
+                    "Completed"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Office365Outlook",
+              "typeProperties": {
+                "inputs": {
+                  "body": {
+                    "To": "Viswanath.Kolisetty@FutureElectronics.com",
+                    "Subject": "Source to Bronze File Failure",
+                    "Body": "<p>Hi Team,</p>\n<p>The Source to Bronze File copy run into error.&nbsp;</p>\n<p>Please find the below details:</p>\n<p>FileName: @{pipeline().parameters.FileName}</p>\n<p>Pipeline ID: @{pipeline().Pipeline}</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>Status: FAILURE</p>\n<p>Error Details: @{activity('CopyDataFromSFTPtoBronze').output.errors}</p>\n<p>The Pipeline Further Execution was stopped Due to failure in Bronze Layer</p>\n<p>Please verify the above details, please feel free to reach out for any help.</p>\n<p><strong>Best Regards</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>",
+                    "Sensitivity": "",
+                    "Importance": "Normal"
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+                }
+              },
+              "name": "File Failure Trigger",
+              "dependsOn": [
+                {
+                  "activity": "CopyDataFromSFTPtoBronze",
+                  "dependencyConditions": [
+                    "Failed"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Office365Outlook",
+              "typeProperties": {
+                "inputs": {
+                  "body": {
+                    "To": "Viswanath.Kolisetty@FutureElectronics.com",
+                    "Subject": "Bronze File to Lakehouse Load Failure",
+                    "Body": "<p>Hi Team,</p>\n<p>The Data load from Bronze files to Lakehouse run into error.</p>\n<p>Please find the below errror details:</p>\n<p>Table Name: @{replace(pipeline().parameters.FileName,'.csv','')}</p>\n<p>Pipeline ID: @{pipeline().Pipeline}</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>Status: FAILURE</p>\n<p>Error Details: @{activity('CopyDataBronzeAsTables').output.errors}</p>\n<p>Please verify the above mentioned details, feel free to reach out if you need any help.</p>\n<p><strong>Best Regards</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>",
+                    "Sensitivity": "",
+                    "Importance": "Normal"
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+                }
+              },
+              "name": "File to Lakehouse Error Trigger",
+              "dependsOn": [
+                {
+                  "activity": "Audit On Failed",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Office365Outlook",
+              "typeProperties": {
+                "inputs": {
+                  "body": {
+                    "To": "Viswanath.Kolisetty@FutureElectronics.com",
+                    "Subject": "Bronze Files to SQL Server Load Failure",
+                    "Body": "<p>Hi Team,</p>\n<p>The Data load from Bronze file to SQL Server has run into error.</p>\n<p>Please find the error details:</p>\n<p>Table Name: @{replace(pipeline().parameters.FileName, '.csv','')}</p>\n<p>Pipeline ID: @{pipeline().Pipeline}</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>Status: FAILURE</p>\n<p>Error Details: @{activity('Copy Data to SQL Warehouse').output.errors}<br>\n</p>\n<p>Please verify the above mentioned error details, feel free to reach out if you need any help.</p>\n<p><strong>Best Regards,</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>",
+                    "Sensitivity": "",
+                    "Importance": "Normal"
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+                }
+              },
+              "name": "File to SQL Server Error Trigger",
+              "dependsOn": [
+                {
+                  "activity": "Copy Data to SQL Warehouse",
+                  "dependencyConditions": [
+                    "Failed"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_BatchLevelAuditing_Updated]",
+                "storedProcedureParameters": {
+                  "BatchID": {
+                    "value": {
+                      "value": "@pipeline().parameters.BatchID",
+                      "type": "Expression"
+                    },
+                    "type": "Int64"
+                  },
+                  "Remarks": {
+                    "value": "Failed due to inner activity failure",
+                    "type": "String"
+                  },
+                  "Status": {
+                    "value": "Failed",
+                    "type": "String"
+                  },
+                  "TotalFiles": {
+                    "value": null,
+                    "type": "Int32"
+                  }
+                }
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 3,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Audit Batch On Failed",
+              "dependsOn": [
+                {
+                  "activity": "File Failure Trigger",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Fail",
+              "typeProperties": {
+                "message": "Pipeline was stopped due to failure in Bronze Layer",
+                "errorCode": "1"
+              },
+              "name": "Stopping Further Pipelien Execution",
+              "dependsOn": [
+                {
+                  "activity": "Audit Batch On Failed",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "database": "pricing",
+                "storedProcedureName": "[guest].[usp_CombineTableData]",
+                "storedProcedureParameters": {
+                  "TableName": {
+                    "value": {
+                      "value": "@{\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_1'), concat('RawData_',concat(\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 4, 4),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 2, 2),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 0, 2)\n),'_Import_01'),\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_2'), concat('RawData_',concat(\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 4, 4),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 2, 2),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 0, 2)\n),'_Import_02'),\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_3'), concat('RawData_',concat(\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 4, 4),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 2, 2),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 0, 2)\n),'_Import_03'),\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_4'), concat('RawData_',concat(\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 4, 4),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 2, 2),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 0, 2)\n),'_Import_04'),\n    if(contains(replace(pipeline().parameters.FileName, '.csv', ''), 'part_5'), concat('RawData_',concat(\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 4, 4),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 2, 2),\n    substring(replace(pipeline().parameters.FolderName, '-', ''), 0, 2)\n),'_Import_05'), 'Unknown')))))\n}",
+                      "type": "Expression"
+                    },
+                    "type": "String"
+                  }
+                }
+              },
+              "externalReferences": {
+                "connection": "4c053270-0612-4007-a1e6-42d60b26f224"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Execute SP to Load Data",
+              "state": "Inactive",
+              "onInactiveMarkAs": "Succeeded",
+              "dependsOn": [
+                {
+                  "activity": "Copy Data to SQL Warehouse",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Office365Outlook",
+              "typeProperties": {
+                "inputs": {
+                  "body": {
+                    "To": "Viswanath.Kolisetty@FutureElectronics.com",
+                    "Subject": "Processing Stored Procedures - Failed",
+                    "Body": "<p>Hi Team,</p>\n<p>The stored procedure processing has been failed, please find the below details:</p>\n<p>Pipeline Name: @{pipeline().PipelineName}</p>\n<p>PipelineId: @{pipeline().Pipeline}</p>\n<p>Pipeline TriggerTime: @{pipeline().TriggerTime}</p>\n<p>Status: FAILURE</p>\n<p>Error Details: @{activity('Execute SP to Load Data').output.errors}</p>\n<p>Please verify the above error details, please reach out to me for any help</p>\n<p><strong>Best Regards,</strong></p>\n<p><strong>Viswanath Kolisetty | Data Engineer</strong></p>\n<p><br></p>",
+                    "Sensitivity": "",
+                    "Importance": "Normal"
+                  },
+                  "method": "post",
+                  "path": "/v2/Mail"
+                }
+              },
+              "name": "Send failure mail for SP",
+              "state": "Inactive",
+              "onInactiveMarkAs": "Succeeded",
+              "dependsOn": [
+                {
+                  "activity": "Execute SP to Load Data",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "name": "Iterate until File copies",
+        "dependsOn": [
+          {
+            "activity": "Set LogID value",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "LogID",
+          "value": {
+            "value": "@activity('Audit on Process Start').output.firstRow.LogID",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Set LogID value",
+        "dependsOn": [
+          {
+            "activity": "Audit on Process Start",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderStoredProcedureName": "[dbo].[StartSFTPFileDownloadLog_Updated]",
+            "storedProcedureParameters": {
+              "BatchID": {
+                "type": "Int64",
+                "value": {
+                  "value": "@pipeline().parameters.BatchID",
+                  "type": "Expression"
+                }
+              },
+              "FilePath": {
+                "type": "String",
+                "value": {
+                  "value": "@pipeline().parameters.FolderPath",
+                  "type": "Expression"
+                }
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          }
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Audit on Process Start",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "FolderPath": {
+        "type": "string",
+        "defaultValue": "/files/findchips"
+      },
+      "FileName": {
+        "type": "string",
+        "defaultValue": "z7183_findchips_2025-05-05_part_1.csv"
+      },
+      "FolderName": {
+        "type": "string",
+        "defaultValue": "05-05-2025"
+      },
+      "BatchID": {
+        "type": "int",
+        "defaultValue": 6
+      }
+    },
+    "variables": {
+      "varIsSuccess": {
+        "type": "String",
+        "defaultValue": "Yes"
+      },
+      "varSuccess": {
+        "type": "String",
+        "defaultValue": "No"
+      },
+      "WaitTime": {
+        "type": "Integer",
+        "defaultValue": 30
+      },
+      "TempWaitTime": {
+        "type": "Integer",
+        "defaultValue": 30
+      },
+      "LogID": {
+        "type": "Integer",
+        "defaultValue": 1
+      }
+    }
+  }
+}

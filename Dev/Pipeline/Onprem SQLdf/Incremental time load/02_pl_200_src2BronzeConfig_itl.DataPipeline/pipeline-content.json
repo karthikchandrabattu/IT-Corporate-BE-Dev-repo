@@ -1,0 +1,330 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('Get Tables List').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "ExecutePipeline",
+              "typeProperties": {
+                "pipeline": {
+                  "referenceName": "867b388c-d1cb-82cc-41bd-46880d575166",
+                  "type": "PipelineReference"
+                },
+                "parameters": {
+                  "BatchID": {
+                    "value": "@pipeline().parameters.BatchId",
+                    "type": "Expression"
+                  },
+                  "SchemaName": {
+                    "value": "@item().SourceSchemaName",
+                    "type": "Expression"
+                  },
+                  "SourceName": {
+                    "value": "@item().SourceDBName",
+                    "type": "Expression"
+                  },
+                  "TableId": {
+                    "value": "@item().ConfigId",
+                    "type": "Expression"
+                  },
+                  "TableName": {
+                    "value": "@item().SourceTableName",
+                    "type": "Expression"
+                  },
+                  "SourceQuery": {
+                    "value": "@item().SourceQuery",
+                    "type": "Expression"
+                  },
+                  "BronzeSchemaName": {
+                    "value": "@item().BronzeSchemaName",
+                    "type": "Expression"
+                  },
+                  "DBSource": {
+                    "value": "@pipeline().parameters.DBSource",
+                    "type": "Expression"
+                  }
+                },
+                "waitOnCompletion": true
+              },
+              "policy": {
+                "secureInput": false
+              },
+              "name": "Invoke Processor Pipeline",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "Loop through each Tables",
+        "dependsOn": [
+          {
+            "activity": "Get Tables List",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@equals(pipeline().parameters.DBSource,'EDM')",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "SqlServerStoredProcedure",
+              "typeProperties": {
+                "storedProcedureName": "[dbo].[usp_UpdateflagEDMtables_based_on_status]"
+              },
+              "linkedService": {
+                "name": "WH_DE_MetaData",
+                "properties": {
+                  "type": "DataWarehouse",
+                  "typeProperties": {
+                    "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                    "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                    "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 3,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Set Flag for EDM tables based on Status",
+              "dependsOn": [
+                {
+                  "activity": "Wait for 5 mins",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "SqlServerSource",
+                  "partitionOption": "None",
+                  "queryTimeout": "02:00:00",
+                  "datasetSettings": {
+                    "type": "SqlServerTable",
+                    "typeProperties": {
+                      "schema": "logs",
+                      "table": "ETL_Status_Table",
+                      "database": "EDM"
+                    },
+                    "schema": [],
+                    "externalReferences": {
+                      "connection": "d1565b37-5a8c-4ebb-9b25-ed365e944970"
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "LakehouseTableSink",
+                  "tableActionOption": "Overwrite",
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "type": "LakehouseTable",
+                    "typeProperties": {
+                      "schema": "meta",
+                      "table": "StatusTable"
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DE_LH_Silver",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "f0951826-6f54-885a-43b4-422616fadab9",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Tables"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Load Status Table from SQL",
+              "dependsOn": []
+            },
+            {
+              "type": "Wait",
+              "typeProperties": {
+                "waitTimeInSeconds": 300
+              },
+              "name": "Wait for 5 mins",
+              "dependsOn": [
+                {
+                  "activity": "Load Status Table from SQL",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ],
+          "ifFalseActivities": []
+        },
+        "name": "If Condition1",
+        "dependsOn": []
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "DataWarehouseSource",
+            "sqlReaderQuery": {
+              "value": "@variables('SourceQuery')",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "DataWarehouseTable",
+            "schema": [],
+            "linkedService": {
+              "name": "WH_DE_MetaData",
+              "properties": {
+                "type": "DataWarehouse",
+                "typeProperties": {
+                  "artifactId": "0e93f2eb-b479-47b7-a661-f42c61983f06",
+                  "endpoint": "dfm4t2vou6wu3g3hioav63of4e-blcyp26hrp4eboy2rijvhggg6q.datawarehouse.fabric.microsoft.com",
+                  "workspaceId": "eb87c50a-8bc7-40f8-bb1a-8a135398c6f4"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get Tables List",
+        "dependsOn": [
+          {
+            "activity": "Check for Table List",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "IfCondition",
+        "typeProperties": {
+          "expression": {
+            "value": "@equals(pipeline().parameters.TableId, '*')",
+            "type": "Expression"
+          },
+          "ifTrueActivities": [
+            {
+              "type": "SetVariable",
+              "typeProperties": {
+                "variableName": "SourceQuery",
+                "value": {
+                  "value": "SELECT [ConfigId],\n\t\t\t[DBSourceName],\n\t\t\t[SourceDBName],\n\t\t\t[SourceSchemaName],\n\t\t\t[SourceTableName],\n\t\t\t[BronzeSchemaName],\n\t\t\t[BronzeTableName],\n\t\t\t[SilverSchemaName],\n\t\t\t[SilverTableName],\n\t\t\t[GoldSchemaName],\n\t\t\t[GoldTableName],\n\t\t\t[PrimaryKey],\n\t\t\t[IsFullLoad],\n\t\t\t[WaterMarkField],\n\t\t\t[WaterMarkValue],\n\t\t\t[IsActive],\n\t\t\tCASE WHEN [IsFullLoad] = 1 THEN [SourceQuery]\n            ELSE [SourceQuery] + ' WHERE ' + [WaterMarkField] + ' >= CAST(''' + [WaterMarkValue] + ''' AS DATETIME2)  OR  ' + [WaterMarkField2] + ' >= CAST(''' + [WaterMarkValue2] + ''' AS DATETIME2)  '\n\t\t\tEND AS [SourceQuery],\n\t\t\t[SourceSystem]\nFROM [WH_DE_MetaData].[Config].[MetaETL] WHERE IsActive = 1\nAND SourceDBName ='@{pipeline().parameters.DBSource}'\n",
+                  "type": "Expression"
+                }
+              },
+              "policy": {
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Source Query without TableId",
+              "dependsOn": []
+            }
+          ],
+          "ifFalseActivities": [
+            {
+              "type": "SetVariable",
+              "typeProperties": {
+                "variableName": "SourceQuery",
+                "value": {
+                  "value": "SELECT [ConfigId],\n\t\t\t[DBSourceName],\n\t\t\t[SourceDBName],\n\t\t\t[SourceSchemaName],\n\t\t\t[SourceTableName],\n\t\t\t[BronzeSchemaName],\n\t\t\t[BronzeTableName],\n\t\t\t[SilverSchemaName],\n\t\t\t[SilverTableName],\n\t\t\t[GoldSchemaName],\n\t\t\t[GoldTableName],\n\t\t\t[PrimaryKey],\n\t\t\t[IsFullLoad],\n\t\t\t[WaterMarkField],\n\t\t\t[WaterMarkValue],\n\t\t\t[IsActive],\n\t\t\tCASE WHEN [IsFullLoad] = 1 THEN [SourceQuery]\n            ELSE [SourceQuery] + ' WHERE ' + [WaterMarkField] + ' >= CAST(''' + [WaterMarkValue] + ''' AS DATETIME2)  OR  ' + [WaterMarkField2] + ' >= CAST(''' + [WaterMarkValue2] + ''' AS DATETIME2)  '\n\t\t\tEND AS [SourceQuery],\n\t\t\t[SourceSystem]\nFROM [WH_DE_MetaData].[Config].[MetaETL] WHERE IsActive = 1\nAND SourceDBName ='@{pipeline().parameters.DBSource}'\nAND ConfigId IN (@{pipeline().parameters.TableId})\n",
+                  "type": "Expression"
+                }
+              },
+              "policy": {
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Source Query with TableId",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "Check for Table List",
+        "dependsOn": [
+          {
+            "activity": "If Condition1",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "BatchId": {
+        "type": "string"
+      },
+      "DBSource": {
+        "type": "string"
+      },
+      "TableId": {
+        "type": "string"
+      }
+    },
+    "variables": {
+      "BatchID": {
+        "type": "Integer"
+      },
+      "StartTime": {
+        "type": "String"
+      },
+      "SourceQuery": {
+        "type": "String"
+      }
+    }
+  }
+}

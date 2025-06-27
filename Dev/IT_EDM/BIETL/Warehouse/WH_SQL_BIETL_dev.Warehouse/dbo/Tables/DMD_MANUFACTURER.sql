@@ -1,0 +1,13 @@
+CREATE TABLE [dbo].[DMD_MANUFACTURER] (
+
+	[MANUFACTURER_KEY] bigint NULL, 
+	[MFR] varchar(8000) NULL, 
+	[MFR_NAME] varchar(8000) NULL, 
+	[FAMILY_NAME] varchar(8000) NULL, 
+	[FRANCHISED] int NULL, 
+	[FTZM] int NULL, 
+	[FAMILYID] int NULL, 
+	[FAMILYNAMEID] int NULL, 
+	[FAMILY_NAME_ABBR] varchar(8000) NULL, 
+	[FOCUS_TYPE] varchar(8000) NULL
+);

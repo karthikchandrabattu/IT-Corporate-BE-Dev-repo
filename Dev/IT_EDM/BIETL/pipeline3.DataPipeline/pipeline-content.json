@@ -1,0 +1,78 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Copy",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": "SELECT [SALES_KEY] AS [SALES_KEY], [REGION_KEY] AS [REGION_KEY], [CMPY_KEY] AS [CMPY_KEY], [INVOICE_DATE] AS [INVOICE_DATE], [CLASS_CODE_KEY] AS [CLASS_CODE_KEY], [MANUFACTURER_KEY] AS [MANUFACTURER_KEY], [MANUFACTURER_REGION_KEY] AS [MANUFACTURER_REGION_KEY], [SHIP_KEY] AS [SHIP_KEY], [BILLTO_KEY] AS [BILLTO_KEY], [DUNS_KEY] AS [DUNS_KEY], [DUNSBRMERGED_KEY] AS [DUNSBRMERGED_KEY], [BRANCH_KEY] AS [BRANCH_KEY], [MERGED_BRANCH_KEY] AS [MERGED_BRANCH_KEY], [PMCATEGORY_KEY] AS [PMCATEGORY_KEY], [SALESPERSON_INSIDE_EMPLOYEE_KEY] AS [SALESPERSON_INSIDE_EMPLOYEE_KEY], [SALESPERSON_OUTSIDE_EMPLOYEE_KEY] AS [SALESPERSON_OUTSIDE_EMPLOYEE_KEY], [ENDCUSTOMER_SHIP_KEY] AS [ENDCUSTOMER_SHIP_KEY], [ENDCUSTOMER_SOURCE] AS [ENDCUSTOMER_SOURCE], [ORDER_TYPE] AS [ORDER_TYPE], [QTY_SHIPPED] AS [QTY_SHIPPED], [RESALE_UNIT_USD] AS [RESALE_UNIT_USD], [RESALE_EXTENDED_USD] AS [RESALE_EXTENDED_USD], [RESALE_EXTENDED_USD_NET_VA] AS [RESALE_EXTENDED_USD_NET_VA], [VALUE_ADDED_USD] AS [VALUE_ADDED_USD], [COST_FE_UNIT] AS [COST_FE_UNIT], [COST_FE_UNIT_USD] AS [COST_FE_UNIT_USD], [COST_FE_EXTENDED_USD] AS [COST_FE_EXTENDED_USD], [COST_BE_UNIT] AS [COST_BE_UNIT], [COST_BE_UNIT_USD] AS [COST_BE_UNIT_USD], [COST_BE_EXTENDED_USD] AS [COST_BE_EXTENDED_USD], [CPN] AS [CPN], [INVOICE_NO] AS [INVOICE_NO], [INVOICE_LINE_NO] AS [INVOICE_LINE_NO], [ORDER_NO] AS [ORDER_NO], [AUTH_CODE] AS [AUTH_CODE], [ORDER_DATE] AS [ORDER_DATE], [REQUIRED_DATE] AS [REQUIRED_DATE], [COMMIT_DATE] AS [COMMIT_DATE], [CUST_INVOICE_NO] AS [CUST_INVOICE_NO], [PROJECT_NO] AS [PROJECT_NO], [PROJECT_LINE_NO] AS [PROJECT_LINE_NO], [REGS_PART_NO] AS [REGS_PART_NO], [VIA_CODE] AS [VIA_CODE], [WBIL_NO] AS [WBIL_NO], [FINAL_COST] AS [FINAL_COST], [FINAL_BE_COST_TYPE] AS [FINAL_BE_COST_TYPE], [SSD_COST] AS [SSD_COST], [SSD_DEBIT_FROM_COST_USD] AS [SSD_DEBIT_FROM_COST_USD], [CRED_RBIL_CODE] AS [CRED_RBIL_CODE], [SHIP_DATE] AS [SHIP_DATE], [SHIP_CMPL] AS [SHIP_CMPL], [BILLING_TYPE] AS [BILLING_TYPE], [WEB_ORDER] AS [WEB_ORDER], [EDI_ORDER] AS [EDI_ORDER], [SALES_CHANNEL] AS [SALES_CHANNEL], [FPN] AS [FPN], [MPN] AS [MPN], [ItemNo] AS [ItemNo], [ORDER_ID] AS [ORDER_ID], [MARKETER_KEY] AS [MARKETER_KEY], [BUYER_CODE] AS [BUYER_CODE], [BUYER_NAME] AS [BUYER_NAME], [FINAL_DEBIT_COST_USD] AS [FINAL_DEBIT_COST_USD], [SSD_SUPPLIER_CURRENCY] AS [SSD_SUPPLIER_CURRENCY], [HISTORICAL_UNIT_COST] AS [HISTORICAL_UNIT_COST], [HISTORICAL_EXCH_RATE_TO_US] AS [HISTORICAL_EXCH_RATE_TO_US], [FINAL_AUTH_CODE] AS [FINAL_AUTH_CODE], [CURRENCY] AS [CURRENCY], [EXCH_RATE] AS [EXCH_RATE], [EXCH_RATE_TO_US] AS [EXCH_RATE_TO_US], [EXCH_RATE_TO_BASE_SALE] AS [EXCH_RATE_TO_BASE_SALE], [EXCH_RATE_TO_US_SALE] AS [EXCH_RATE_TO_US_SALE], [MARGIN_TYPE] AS [MARGIN_TYPE], [PROG_PART_NO] AS [PROG_PART_NO], [PICK_CMPY_CODE] AS [PICK_CMPY_CODE], [MPN_CORE] AS [MPN_CORE], [PART_ALERT] AS [PART_ALERT], [PRODUCT_TYPE] AS [PRODUCT_TYPE], [REG_FLAG] AS [REG_FLAG], [EXCH_RATE_TO_US_SUPP] AS [EXCH_RATE_TO_US_SUPP], [SSD_QTY] AS [SSD_QTY], [ADJU_COST] AS [ADJU_COST], [ADJU_REAS_CODE] AS [ADJU_REAS_CODE], [DISCOUNT_RATE] AS [DISCOUNT_RATE], [IBVP_RATE] AS [IBVP_RATE], [FREIGHT_RATE] AS [FREIGHT_RATE], [ONTIMEDELIVERY] AS [ONTIMEDELIVERY], [CUSTOMER_MPN_KEY] AS [CUSTOMER_MPN_KEY] FROM [dbo].[DMF_BILLING]",
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00",
+            "datasetSettings": {
+              "type": "SqlServerTable",
+              "typeProperties": {
+                "database": "EDM"
+              },
+              "schema": [],
+              "externalReferences": {
+                "connection": "d1565b37-5a8c-4ebb-9b25-ed365e944970"
+              },
+              "annotations": []
+            }
+          },
+          "sink": {
+            "type": "LakehouseTableSink",
+            "tableActionOption": "OverwriteSchema",
+            "partitionOption": "PartitionByKey",
+            "partitionNameList": [
+              "REGION_KEY",
+              "ORDER_TYPE",
+              "CMPY_KEY",
+              "CLASS_CODE_KEY",
+              "WEB_ORDER"
+            ],
+            "datasetSettings": {
+              "type": "LakehouseTable",
+              "typeProperties": {
+                "table": "DMF_BILLING"
+              },
+              "schema": [],
+              "linkedService": {
+                "name": "LH_SQL_BIETL",
+                "properties": {
+                  "type": "Lakehouse",
+                  "typeProperties": {
+                    "artifactId": "0f7a0e3c-d7dc-a599-493d-55769fce3718",
+                    "workspaceId": "00000000-0000-0000-0000-000000000000",
+                    "rootFolder": "Tables"
+                  },
+                  "annotations": []
+                }
+              },
+              "annotations": []
+            }
+          },
+          "translator": {
+            "type": "TabularTranslator",
+            "typeConversion": true,
+            "typeConversionSettings": {
+              "allowDataTruncation": true,
+              "treatBooleanAsNumber": false
+            }
+          },
+          "enableStaging": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Copy data1",
+        "dependsOn": []
+      }
+    ]
+  }
+}
